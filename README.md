@@ -44,7 +44,7 @@ To get started with publishing to Maven Central, sign in (or create a new accoun
 **For a GitHub repository**
 Using your GitHub account to create a namespace is a good option if you don’t own a domain name to use for publication. To create a namespace based on your GitHub account:
 
-1. Enter `io.github.<your username>` as your namespace. For example, `io.github.kotlin-hands-on`.
+1. Enter `io.github.<your username>` as your namespace. For example, `eu.iamkonstantin.kotlin-hands-on`.
 2. Copy the Verification Key displayed.
 3. On GitHub, create a new repository with your GitHub account with the verification key as the repository’s name. For example, `http://github.com/kotlin-hands-on/ex4mpl3c0d`.
 4. Navigate back to Maven Central, and click on the Verify Namespace button. After verification succeeds you can delete the repository you’ve created.
@@ -194,7 +194,7 @@ If you have an Android target in your project, you should follow the [steps to p
 // build.gradle.kts
 
 android {
-     namespace = "io.github.kotlinhandson.fibonacci"
+     namespace = "eu.iamkonstantin.kotlinhandson.fibonacci"
 }
 ```
 
