@@ -1,6 +1,6 @@
 package eu.iamkonstantin.kotlin.gadulka
 
-interface GadulkaAudioPlayer {
+internal interface GadulkaAudioPlayer {
     fun play(url: String)
 }
 

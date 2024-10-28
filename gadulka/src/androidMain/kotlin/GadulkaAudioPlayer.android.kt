@@ -7,6 +7,7 @@ actual class GadulkaPlayer : GadulkaAudioPlayer {
     private val mediaPlayer = MediaPlayer()
 
     actual override fun play(url: String) {
+        if (mediaPlayer.isPlaying) mediaPlayer.stop()
         mediaPlayer.reset()
         mediaPlayer.setDataSource(url)
         mediaPlayer.prepareAsync()
