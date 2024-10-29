@@ -10,7 +10,7 @@ plugins {
 }
 
 group = "eu.iamkonstantin.kotlin"
-version = "1.0.3"
+version = "1.0.5"
 
 kotlin {
     jvm()
@@ -56,6 +56,10 @@ kotlin {
                 implementation("org.openjfx:javafx-media:19:${fxSuffix}")
 //                implementation(libs.kotlinx.coroutines.swing)
             }
+        }
+
+        androidMain.dependencies {
+            implementation(libs.androix.media3.exploplayer)
         }
     }
 }
