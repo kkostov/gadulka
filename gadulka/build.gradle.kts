@@ -38,8 +38,6 @@ kotlin {
         }
         val jvmMain by getting {
             dependencies {
-//                implementation(compose.desktop.common)
-//                implementation(compose.desktop.currentOs)
                 val fxSuffix = when (osdetector.classifier) {
                     "linux-x86_64" -> "linux"
                     "linux-aarch_64" -> "linux-aarch64"
@@ -54,7 +52,6 @@ kotlin {
                 implementation("org.openjfx:javafx-swing:19:${fxSuffix}")
                 implementation("org.openjfx:javafx-web:19:${fxSuffix}")
                 implementation("org.openjfx:javafx-media:19:${fxSuffix}")
-//                implementation(libs.kotlinx.coroutines.swing)
             }
         }
 
