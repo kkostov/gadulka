@@ -83,7 +83,7 @@ mavenPublishing {
         url = "https://github.com/kkostov/gadulka/"
         licenses {
             license {
-                name = "GPLv3"
+                name = "BSD-3-Clause"
                 url = "https://www.gnu.org/licenses/gpl-3.0.html#license-text"
             }
         }
