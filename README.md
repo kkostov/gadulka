@@ -1,4 +1,15 @@
+<div>
+ <img src="https://img.shields.io/badge/Platform-Android-brightgreen.svg?logo=android" alt="Badge Android" />
+
+<img src="https://img.shields.io/badge/Platform-iOS%20%2F%20macOS-lightgrey.svg?logo=apple" alt="Badge iOS" />
+
+<img src="https://img.shields.io/badge/Platform-JVM-8A2BE2.svg?logo=openjdk" alt="Badge JVM" />
+
+</div>
+
 ![Maven Central Version](https://img.shields.io/maven-central/v/eu.iamkonstantin.kotlin/gadulka)
+
+[![Build](https://github.com/kkostov/gadulka/actions/workflows/gradle.yml/badge.svg)](https://github.com/kkostov/gadulka/actions/workflows/gradle.yml)
 
 # Gadulka
 
@@ -77,6 +88,7 @@ pipeline for Gadulka requires a macOS build in order to test iOS compatibility. 
 run for which GitHub makes more sense. Of course, this is something that can change in the future.
 
 ## License 📃
+
 The library is licensed with the BSD-3-Clause license, more information in [LICENSE](LICENSE).
 
 This is a permissive license which allows for any type of use, provided the copyright notice is included.
