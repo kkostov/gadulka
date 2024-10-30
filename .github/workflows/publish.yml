@@ -14,6 +14,8 @@ jobs:
         with:
           distribution: 'zulu'
           java-version: 21
+      - name: Set release version
+        run: bash ./setversion.sh ${{ github.ref_name }} gadulka/build.gradle.kts
       - name: Publish to MavenCentral
         run: ./gradlew publishToMavenCentral --no-configuration-cache
         env:

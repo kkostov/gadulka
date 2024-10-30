@@ -6,10 +6,11 @@ plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.androidLibrary)
     alias(libs.plugins.vanniktech.mavenPublish)
+    alias(libs.plugins.osdetector)
 }
 
 group = "eu.iamkonstantin.kotlin"
-version = "1.0.0"
+version = "1.0.5"
 
 kotlin {
     jvm()
@@ -23,7 +24,6 @@ kotlin {
     iosX64()
     iosArm64()
     iosSimulatorArm64()
-    linuxX64()
 
     sourceSets {
         val commonMain by getting {
@@ -35,6 +35,28 @@ kotlin {
             dependencies {
                 implementation(libs.kotlin.test)
             }
+        }
+        val jvmMain by getting {
+            dependencies {
+                val fxSuffix = when (osdetector.classifier) {
+                    "linux-x86_64" -> "linux"
+                    "linux-aarch_64" -> "linux-aarch64"
+                    "windows-x86_64" -> "win"
+                    "osx-x86_64" -> "mac"
+                    "osx-aarch_64" -> "mac-aarch64"
+                    else -> throw IllegalStateException("Unknown OS: ${osdetector.classifier}")
+                }
+                implementation("org.openjfx:javafx-base:19:${fxSuffix}")
+                implementation("org.openjfx:javafx-graphics:19:${fxSuffix}")
+                implementation("org.openjfx:javafx-controls:19:${fxSuffix}")
+                implementation("org.openjfx:javafx-swing:19:${fxSuffix}")
+                implementation("org.openjfx:javafx-web:19:${fxSuffix}")
+                implementation("org.openjfx:javafx-media:19:${fxSuffix}")
+            }
+        }
+
+        androidMain.dependencies {
+            implementation(libs.androix.media3.exploplayer)
         }
     }
 }
