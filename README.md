@@ -80,3 +80,5 @@ run for which GitHub makes more sense. Of course, this is something that can cha
 The library is licensed with the BSD-3-Clause license, more information in [LICENSE](LICENSE).
 
 This is a permissive license which allows for any type of use, provided the copyright notice is included.
+
+This library project was initially created from [JetBrains's Library Template](https://github.com/Kotlin/multiplatform-library-template) under the Apachage 2.0 license.
