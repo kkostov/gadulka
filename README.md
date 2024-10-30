@@ -21,8 +21,17 @@ implementation("eu.iamkonstantin.kotlin:gadulka:1.1.0")
 Instantiate the player and call play!
 
 ```kotlin
+val player = GadulkaPlayer()
+player.play(url = "...")
+player.stop()
+player.release()
+```
+
+Example using Jetpack Compose:
+
+```kotlin
 @Composable
-fun AudioPlayer(player: GadulkaPlayer = GadulkaPlaye()) {
+fun AudioPlayer(player: GadulkaPlayer = GadulkaPlayer()) {
     val url = remember { mutableStateOf("https://download.samplelib.com/wav/sample-12s.wav") }
 
     Row {
