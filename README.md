@@ -76,7 +76,7 @@ While my personal projects use a self-hosted Forgejo or take advantage of the fa
 pipeline for Gadulka requires a macOS build in order to test iOS compatibility. This is a very intensive (and expensive)
 run for which GitHub makes more sense. Of course, this is something that can change in the future.
 
-License 📃
+## License 📃
 The library is licensed with the BSD-3-Clause license, more information in [LICENSE](LICENSE).
 
 This is a permissive license which allows for any type of use, provided the copyright notice is included.
