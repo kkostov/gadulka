@@ -26,7 +26,7 @@ does not provide any UI (this will be up to you).
 Gadulka is available from Maven Central at the following coordinates:
 
 ```
-implementation("eu.iamkonstantin.kotlin:gadulka:1.1.0")
+implementation("eu.iamkonstantin.kotlin:gadulka:x.x.x")
 ```
 
 Instantiate the player and call play!
