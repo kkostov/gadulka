@@ -13,6 +13,8 @@
 
 # Gadulka
 
+![Kodee with a music icon](./images/kodee.jpg)
+
 ## What is it?
 
 Gadulka is a minimalistic player library for Kotlin Multiplatform. It targets Android, jvm and iOS, allowing consumers
@@ -93,4 +95,6 @@ The library is licensed with the BSD-3-Clause license, more information in [LICE
 
 This is a permissive license which allows for any type of use, provided the copyright notice is included.
 
-This library project was initially created from [JetBrains's Library Template](https://github.com/Kotlin/multiplatform-library-template) under the Apache 2.0 license.
+This library project was initially created
+from [JetBrains's Library Template](https://github.com/Kotlin/multiplatform-library-template) under the Apache 2.0
+license.
