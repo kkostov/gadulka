@@ -21,7 +21,7 @@ Gadulka is a minimalistic player library for Kotlin Multiplatform. It targets An
 to play audio files.
 
 To achieve this, Gadulka wraps the native player functionality from each target in "headless" mode. That is, the library
-does not provide any UI (this will be up to you).
+does not provide any UI (this will be up to you). You can read more about my motivations [here](https://iamkonstantin.eu/blog/meet-gadulka-a-minimalistic-player-library-for-kotlin-multiplatform/).
 
 ## Getting Started
 
