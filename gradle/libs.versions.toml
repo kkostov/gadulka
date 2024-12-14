@@ -4,11 +4,12 @@ kotlin = "2.0.21"
 android-minSdk = "24"
 android-compileSdk = "34"
 media3_version = "1.4.1"
+kotlinx-browser = "0.3"
 
 [libraries]
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
 androix-media3-exploplayer = { group = "androidx.media3", name = "media3-exoplayer", version.ref = "media3_version" }
-
+kotlinx-browser = { module = "org.jetbrains.kotlinx:kotlinx-browser-wasm-js", version.ref = "kotlinx-browser" }
 
 [plugins]
 androidLibrary = { id = "com.android.library", version.ref = "agp" }
