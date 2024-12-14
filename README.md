@@ -31,6 +31,8 @@ Gadulka is available from Maven Central at the following coordinates:
 implementation("eu.iamkonstantin.kotlin:gadulka:x.x.x")
 ```
 
+### Example
+
 Instantiate the player and call play!
 
 ```kotlin
@@ -40,6 +42,7 @@ player.stop()
 player.release()
 ```
 
+### Jetpack Compose
 Example using Jetpack Compose:
 
 ```kotlin
@@ -66,7 +69,15 @@ fun AudioPlayer(player: GadulkaPlayer = GadulkaPlayer()) {
 }
 ```
 
-For Android, the player needs a reference to the android context. For example, using Koin (or another DI library):
+### Android
+
+For Android, the player needs a reference to the android context.
+
+```kotlin
+ GadulkaPlayer(LocalContext.current)
+```
+
+Or using Koin (or another DI library):
 
 ```kotlin
 factory<GadulkaPlayer> {
