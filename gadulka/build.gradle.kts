@@ -94,7 +94,7 @@ mavenPublishing {
             }
         }
         scm {
-            url = "https://github.com/kkostov/gadulka/"
+            url = "https://github.com/kkostov/gadulka"
         }
     }
 }
