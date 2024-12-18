@@ -80,7 +80,7 @@ mavenPublishing {
         name = "Gadulka"
         description = "Gadulka is cross-platform player library enabling playback of files for Kotlin apps"
         inceptionYear = "2024"
-        url = "https://github.com/kkostov/gadulka/"
+        url = "https://iamkonstantin.eu/blog/meet-gadulka-a-minimalistic-player-library-for-kotlin-multiplatform/"
         licenses {
             license {
                 name = "BSD-3-Clause"
