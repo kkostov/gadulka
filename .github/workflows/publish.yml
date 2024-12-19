@@ -9,11 +9,11 @@ jobs:
     steps:
       - name: Check out code
         uses: actions/checkout@v4
-      - name: Set up JDK 21
+      - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
-          distribution: 'zulu'
-          java-version: 21
+          java-version: "17"
+          distribution: "temurin"
       - name: Set release version
         run: bash ./setversion.sh ${{ github.ref_name }} gadulka/build.gradle.kts
       - name: Publish to MavenCentral
