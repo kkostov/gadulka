@@ -1,9 +1,12 @@
 <div>
- <img src="https://img.shields.io/badge/Platform-Android-brightgreen.svg?logo=android" alt="Badge Android" />
+ <img src="https://img.shields.io/badge/Platform-Android-brightgreen.svg?logo=android" alt="Platform Android" />
 
-<img src="https://img.shields.io/badge/Platform-iOS%20%2F%20macOS-lightgrey.svg?logo=apple" alt="Badge iOS" />
+<img src="https://img.shields.io/badge/Platform-iOS%20%2F%20macOS-lightgrey.svg?logo=apple" alt="Platform iOS and macOS" />
 
-<img src="https://img.shields.io/badge/Platform-JVM-8A2BE2.svg?logo=openjdk" alt="Badge JVM" />
+<img src="https://img.shields.io/badge/Platform-JVM-8A2BE2.svg?logo=openjdk" alt="Platform JVM" />
+
+<img alt="Platform WASM" src="https://img.shields.io/badge/Platform-WASM-654EF1">
+
 
 </div>
 
