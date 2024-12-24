@@ -38,6 +38,7 @@ actual class GadulkaPlayer(val htmlId: String) {
     actual fun release() {
         val playerEl = getPlayerElement()
         playerEl?.pause()
+        playerEl?.remove()
     }
 
     private fun getPlayerElement(): HTMLAudioElement? {
