@@ -31,7 +31,7 @@ does not provide any UI (this will be up to you). You can read more about my mot
 Gadulka is available from Maven Central at the following coordinates:
 
 ```
-implementation("eu.iamkonstantin.kotlin:gadulka:1.4.3")
+implementation("eu.iamkonstantin.kotlin:gadulka:1.5.0")
 ```
 
 ### Example
