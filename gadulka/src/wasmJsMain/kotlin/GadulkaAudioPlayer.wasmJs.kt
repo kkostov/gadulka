@@ -1,14 +1,10 @@
 package eu.iamkonstantin.kotlin.gadulka
 
 import kotlinx.browser.document
-import kotlinx.browser.window
 import kotlinx.dom.appendElement
-import kotlinx.dom.appendText
-import org.w3c.dom.Element
 import org.w3c.dom.HTMLAudioElement
-import org.w3c.dom.HTMLInputElement
 
-
+@Suppress("EXPECT_ACTUAL_CLASSIFIERS_ARE_IN_BETA_WARNING")
 actual class GadulkaPlayer(val htmlId: String) {
     actual fun play(url: String) {
         release()
@@ -45,4 +41,11 @@ actual class GadulkaPlayer(val htmlId: String) {
         return document.getElementById(htmlId) as? HTMLAudioElement
     }
 
+    actual fun getCurrentPosition(): Long? {
+        val currentTimeSeconds =  getPlayerElement()?.currentTime?.toLong()
+        if (currentTimeSeconds != null && currentTimeSeconds >= 0) {
+            return currentTimeSeconds * 1000
+        }
+        return null
+    }
 }
