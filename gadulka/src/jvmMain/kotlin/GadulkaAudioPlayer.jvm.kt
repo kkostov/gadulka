@@ -6,6 +6,7 @@ import javafx.scene.media.Media
 import javafx.scene.media.MediaPlayer
 import java.net.URI
 
+@Suppress("EXPECT_ACTUAL_CLASSIFIERS_ARE_IN_BETA_WARNING")
 actual class GadulkaPlayer {
     var playerState: MediaPlayer? = null
 
@@ -45,5 +46,9 @@ actual class GadulkaPlayer {
 
     actual fun stop() {
         playerState?.stop()
+    }
+
+    actual fun getCurrentPosition(): Long? {
+        return playerState?.currentTime?.toMillis()?.toLong()
     }
 }

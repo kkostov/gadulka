@@ -13,6 +13,7 @@ player.stop()
 player.release()
 ```
  */
+@Suppress("EXPECT_ACTUAL_CLASSIFIERS_ARE_IN_BETA_WARNING")
 expect class GadulkaPlayer {
     /**
      * Start playback of the audio resource at the provided [url].
@@ -47,4 +48,12 @@ expect class GadulkaPlayer {
      *
      */
     fun release()
+
+
+    /**
+     * Retrieves the current playback position in milliseconds.
+     *
+     * @return The current playback position in milliseconds, or null if the position cannot be determined.
+     */
+    fun getCurrentPosition(): Long?
 }
