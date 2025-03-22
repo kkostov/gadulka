@@ -36,12 +36,28 @@ expect class GadulkaPlayer {
      */
     fun play(url: String)
 
+
     /**
-     * Stop playback.
+     * Resumes audio playback from the current position if it was previously paused.
+     *
+     * This function has no effect if the player is already in a playing state.
+     */
+    fun play()
+
+    /**
+     * Stop playback and return the play position to the beginning of time (position 0).
      *
      * Note: If the player is currently not playing, this action has no effect.
      */
     fun stop()
+
+
+    /**
+     * Pauses the audio playback without resetting the play position. To resume playback, call [play].
+     *
+     * If the player is currently not in a playing state, this method has no effect.
+     */
+    fun pause()
 
     /**
      * Pause and attempts to perform cleanup in order to dispose of any player resources.

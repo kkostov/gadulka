@@ -18,14 +18,17 @@ actual class GadulkaPlayer(val htmlId: String) {
         playerEl?.play()
     }
 
-    /**
-     * Stop playback.
-     *
-     * Note: the player element remains in the DOM.
-     */
+    actual fun play() {
+        getPlayerElement()?.play()
+    }
+
     actual fun stop() {
-        val playerEl = getPlayerElement()
-        playerEl?.pause()
+        getPlayerElement()?.pause()
+        getPlayerElement()?.currentTime = 0.0
+    }
+
+    actual fun pause() {
+        getPlayerElement()?.pause()
     }
 
     /**

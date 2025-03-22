@@ -25,6 +25,10 @@ actual class GadulkaPlayer(private val context: Context) {
         mediaPlayer.play()
     }
 
+    actual fun play() {
+        if(mediaPlayer.isCommandAvailable(Player.COMMAND_PLAY_PAUSE)) mediaPlayer.play()
+    }
+
 
     /**
      * Android-specific implementation of the [play] method which uses a ContentResolver to calculate the Uri of a raw file resource bundled with the app.
@@ -74,6 +78,10 @@ actual class GadulkaPlayer(private val context: Context) {
     }
 
     actual fun stop() {
+        mediaPlayer.stop()
+    }
+
+    actual fun pause() {
         mediaPlayer.pause()
     }
 

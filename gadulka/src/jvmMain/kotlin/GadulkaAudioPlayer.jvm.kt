@@ -43,6 +43,10 @@ actual class GadulkaPlayer {
         }
     }
 
+    actual fun play() {
+        playerState?.play()
+    }
+
     actual fun release() {
         playerState?.stop()
         playerState = null
@@ -50,6 +54,10 @@ actual class GadulkaPlayer {
 
     actual fun stop() {
         playerState?.stop()
+    }
+
+    actual fun pause() {
+        playerState?.pause()
     }
 
     actual fun currentPosition(): Long? {

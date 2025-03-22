@@ -60,6 +60,11 @@ actual class GadulkaPlayer {
         player?.play()
     }
 
+    actual fun play() {
+        // https://developer.apple.com/documentation/avfoundation/avplayer/play()
+        player?.play()
+    }
+
 
     actual fun release() {
         playerObserver?.detach()
@@ -69,6 +74,11 @@ actual class GadulkaPlayer {
     }
 
     actual fun stop() {
+        player?.pause()
+        player?.replaceCurrentItemWithPlayerItem(null)
+    }
+
+    actual fun pause() {
         player?.pause()
     }
 
