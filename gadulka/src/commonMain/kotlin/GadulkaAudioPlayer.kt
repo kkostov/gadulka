@@ -78,6 +78,17 @@ expect class GadulkaPlayer {
      * @return The current volume as a floating-point value, or null if it cannot be determined.
      */
     fun currentVolume(): Float?
+
+
+    /**
+     * Adjusts the volume level of the player.
+     *
+     * @param volume The desired volume level as a floating-point value, where 0.0 represents silence
+     * and 1.0 represents the maximum audio volume for the player instance.
+     *
+     * Note: this method has no effect on the system/device volume, it only targets the player instance.
+     */
+    fun setVolume(volume: Float)
 }
 
 

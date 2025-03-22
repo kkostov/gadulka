@@ -66,6 +66,13 @@ actual class GadulkaPlayer(val htmlId: String) {
     }
 
     actual fun currentVolume(): Float? {
+        // https://developer.mozilla.org/en-US/docs/Web/API/HTMLMediaElement/volume
         return getPlayerElement()?.volume?.toFloat()
+    }
+
+
+    actual fun setVolume(volume: Float) {
+        // https://developer.mozilla.org/en-US/docs/Web/API/HTMLMediaElement/volume
+        getPlayerElement()?.volume = volume.toDouble()
     }
 }

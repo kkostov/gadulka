@@ -83,4 +83,9 @@ actual class GadulkaPlayer(private val context: Context) {
        }
        return null
     }
+
+    actual fun setVolume(volume: Float) {
+        if (!mediaPlayer.isCommandAvailable(Player.COMMAND_GET_VOLUME)) return
+        mediaPlayer.volume = volume
+    }
 }

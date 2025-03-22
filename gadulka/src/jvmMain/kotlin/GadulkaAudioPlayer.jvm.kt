@@ -76,4 +76,8 @@ actual class GadulkaPlayer {
     actual fun currentVolume(): Float? {
         return playerState?.volume?.toFloat()
     }
+
+    actual fun setVolume(volume: Float) {
+        playerState?.volume = volume.toDouble()
+    }
 }

@@ -99,6 +99,10 @@ actual class GadulkaPlayer {
         return player?.volume
     }
 
+    actual fun setVolume(volume: Float) {
+        player?.volume = volume
+    }
+
     actual fun currentPlayerState(): GadulkaPlayerState? {
         return _state
     }
