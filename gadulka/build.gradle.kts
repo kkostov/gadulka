@@ -10,7 +10,7 @@ plugins {
 }
 
 group = "eu.iamkonstantin.kotlin"
-version = "0.0.602"
+version = "0.0.603"
 
 kotlin {
     jvm()

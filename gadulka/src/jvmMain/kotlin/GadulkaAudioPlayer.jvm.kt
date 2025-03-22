@@ -5,6 +5,10 @@ import javafx.embed.swing.JFXPanel
 import javafx.scene.media.Media
 import javafx.scene.media.MediaPlayer
 import java.net.URI
+import kotlin.time.Duration
+import kotlin.time.DurationUnit
+import kotlin.time.toDuration
+import kotlin.time.toJavaDuration
 
 @Suppress("EXPECT_ACTUAL_CLASSIFIERS_ARE_IN_BETA_WARNING")
 actual class GadulkaPlayer {
@@ -83,5 +87,9 @@ actual class GadulkaPlayer {
 
     actual fun setRate(rate: Float) {
         playerState?.rate = rate.toDouble()
+    }
+
+    actual fun seekTo(time: Long) {
+        playerState?.seek(javafx.util.Duration.millis(time.toDouble()))
     }
 }

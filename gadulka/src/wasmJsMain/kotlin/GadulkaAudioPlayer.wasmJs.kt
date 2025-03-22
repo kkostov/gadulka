@@ -82,4 +82,9 @@ actual class GadulkaPlayer(val htmlId: String) {
         // Acceptable values are 0.25 to 4.0
         getPlayerElement()?.playbackRate = rate.toDouble()
     }
+
+    actual fun seekTo(time: Long) {
+        // https://developer.mozilla.org/en-US/docs/Web/API/HTMLMediaElement/currentTime
+        getPlayerElement()?.currentTime = time.toDouble()
+    }
 }

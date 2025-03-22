@@ -108,6 +108,13 @@ actual class GadulkaPlayer {
         player?.rate = rate
     }
 
+
+    actual fun seekTo(time: Long) {
+        // https://developer.apple.com/documentation/avfoundation/avplayer/seek(to:)-87h2r
+        val duration = CMTimeMake(time, 1000)
+        player?.seekToTime(duration)
+    }
+
     actual fun currentPlayerState(): GadulkaPlayerState? {
         return _state
     }

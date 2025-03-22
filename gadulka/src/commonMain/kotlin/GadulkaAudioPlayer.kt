@@ -100,6 +100,14 @@ expect class GadulkaPlayer {
      * The value must be positive (grater than 0.0).
      */
     fun setRate(rate: Float)
+
+
+    /**
+     * Seeks to the specified playback position in the currently playing media.
+     *
+     * @param time The desired playback position in milliseconds. Must be within the duration of the media.
+     */
+    fun seekTo(time: Long)
 }
 
 

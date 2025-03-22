@@ -93,4 +93,9 @@ actual class GadulkaPlayer(private val context: Context) {
         if (!mediaPlayer.isCommandAvailable(Player.COMMAND_SET_SPEED_AND_PITCH)) return
         mediaPlayer.playbackParameters = mediaPlayer.playbackParameters.withSpeed(rate)
     }
+
+    actual fun seekTo(time: Long) {
+        if (!mediaPlayer.isCommandAvailable(Player.COMMAND_SEEK_IN_CURRENT_MEDIA_ITEM)) return
+        mediaPlayer.seekTo(time)
+    }
 }
