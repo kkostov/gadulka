@@ -88,4 +88,9 @@ actual class GadulkaPlayer(private val context: Context) {
         if (!mediaPlayer.isCommandAvailable(Player.COMMAND_GET_VOLUME)) return
         mediaPlayer.volume = volume
     }
+
+    actual fun setRate(rate: Float) {
+        if (!mediaPlayer.isCommandAvailable(Player.COMMAND_SET_SPEED_AND_PITCH)) return
+        mediaPlayer.playbackParameters = mediaPlayer.playbackParameters.withSpeed(rate)
+    }
 }

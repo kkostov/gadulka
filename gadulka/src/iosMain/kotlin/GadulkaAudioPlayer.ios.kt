@@ -103,6 +103,11 @@ actual class GadulkaPlayer {
         player?.volume = volume
     }
 
+    actual fun setRate(rate: Float) {
+        // https://developer.apple.com/documentation/avfoundation/controlling-the-transport-behavior-of-a-player#Control-the-playback-rate
+        player?.rate = rate
+    }
+
     actual fun currentPlayerState(): GadulkaPlayerState? {
         return _state
     }

@@ -80,4 +80,8 @@ actual class GadulkaPlayer {
     actual fun setVolume(volume: Float) {
         playerState?.volume = volume.toDouble()
     }
+
+    actual fun setRate(rate: Float) {
+        playerState?.rate = rate.toDouble()
+    }
 }

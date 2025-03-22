@@ -75,4 +75,11 @@ actual class GadulkaPlayer(val htmlId: String) {
         // https://developer.mozilla.org/en-US/docs/Web/API/HTMLMediaElement/volume
         getPlayerElement()?.volume = volume.toDouble()
     }
+
+    actual fun setRate(rate: Float) {
+        // https://developer.mozilla.org/en-US/docs/Web/API/HTMLMediaElement/playbackRate
+        // Web browsers may choose to mute playback if rate is outside the useful range
+        // Acceptable values are 0.25 to 4.0
+        getPlayerElement()?.playbackRate = rate.toDouble()
+    }
 }

@@ -89,6 +89,17 @@ expect class GadulkaPlayer {
      * Note: this method has no effect on the system/device volume, it only targets the player instance.
      */
     fun setVolume(volume: Float)
+
+
+    /**
+     * Adjusts the playback speed of the audio.
+     *
+     * @param rate The desired playback speed as a floating-point value, where 1.0 indicates normal speed,
+     * values greater than 1.0 indicate faster playback, and values less than 1.0 indicate slower playback.
+     *
+     * The value must be positive (grater than 0.0).
+     */
+    fun setRate(rate: Float)
 }
 
 
