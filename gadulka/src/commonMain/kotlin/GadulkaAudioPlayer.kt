@@ -71,3 +71,11 @@ expect class GadulkaPlayer {
      */
     fun currentPlayerState(): GadulkaPlayerState?
 }
+
+
+/**
+ * Checks whether the player is currently in a playing or buffering state.
+ *
+ * @return `true` if the player is in the PLAYING or BUFFERING state, otherwise `false`.
+ */
+fun GadulkaPlayer.isPlaying(): Boolean = currentPlayerState() in listOf(GadulkaPlayerState.PLAYING, GadulkaPlayerState.BUFFERING)
