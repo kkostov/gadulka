@@ -48,7 +48,28 @@ actual class GadulkaPlayer {
         playerState?.stop()
     }
 
-    actual fun getCurrentPosition(): Long? {
+    actual fun currentPosition(): Long? {
         return playerState?.currentTime?.toMillis()?.toLong()
+    }
+
+    actual fun currentDuration(): Long? {
+        return playerState?.media?.duration?.toMillis()?.toLong()
+    }
+
+    actual fun currentPlayerState(): GadulkaPlayerState? {
+        val status = playerState?.status
+        if (status == null) {
+            return null
+        }
+        return when (status) {
+            MediaPlayer.Status.UNKNOWN -> null
+            MediaPlayer.Status.READY -> GadulkaPlayerState.IDLE
+            MediaPlayer.Status.PAUSED -> GadulkaPlayerState.PAUSED
+            MediaPlayer.Status.PLAYING -> GadulkaPlayerState.PLAYING
+            MediaPlayer.Status.STOPPED -> GadulkaPlayerState.IDLE
+            MediaPlayer.Status.STALLED -> GadulkaPlayerState.IDLE
+            MediaPlayer.Status.HALTED -> GadulkaPlayerState.IDLE
+            MediaPlayer.Status.DISPOSED -> null
+        }
     }
 }

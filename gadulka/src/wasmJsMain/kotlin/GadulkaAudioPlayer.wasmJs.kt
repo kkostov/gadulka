@@ -41,11 +41,27 @@ actual class GadulkaPlayer(val htmlId: String) {
         return document.getElementById(htmlId) as? HTMLAudioElement
     }
 
-    actual fun getCurrentPosition(): Long? {
+    actual fun currentPosition(): Long? {
+        // https://www.w3schools.com/jsref/prop_audio_currenttime.asp
         val currentTimeSeconds =  getPlayerElement()?.currentTime?.toLong()
         if (currentTimeSeconds != null && currentTimeSeconds >= 0) {
             return currentTimeSeconds * 1000
         }
+        return null
+    }
+
+    actual fun currentDuration(): Long? {
+        // https://www.w3schools.com/jsref/prop_audio_duration.asp
+        val currentTimeSeconds =  getPlayerElement()?.duration?.toLong()
+        if (currentTimeSeconds != null && currentTimeSeconds >= 0) {
+            return currentTimeSeconds * 1000
+        }
+        return null
+    }
+
+    actual fun currentPlayerState(): GadulkaPlayerState? {
+        // todo: observe the player events
+        // https://developer.mozilla.org/en-US/docs/Web/HTML/Element/audio#events
         return null
     }
 }

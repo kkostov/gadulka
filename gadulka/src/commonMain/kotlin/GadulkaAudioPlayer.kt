@@ -53,7 +53,21 @@ expect class GadulkaPlayer {
     /**
      * Retrieves the current playback position in milliseconds.
      *
-     * @return The current playback position in milliseconds, or null if the position cannot be determined.
+     * @return The current playback position in milliseconds, or null if it cannot be determined.
      */
-    fun getCurrentPosition(): Long?
+    fun currentPosition(): Long?
+
+    /**
+     * Retrieves the total duration of the playback item in milliseconds.
+     *
+     * @return The duration of the playing item in milliseconds, or null if it cannot be determined.
+     */
+    fun currentDuration(): Long?
+
+    /**
+     * Retrieves the current state of the player
+     *
+     * @return The current state like [PLAYING], [BUFFERING], [IDLE], [PAUASED].
+     */
+    fun currentPlayerState(): GadulkaPlayerState?
 }
