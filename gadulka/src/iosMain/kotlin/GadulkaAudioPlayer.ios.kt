@@ -94,6 +94,11 @@ actual class GadulkaPlayer {
         return null
     }
 
+    actual fun currentVolume(): Float? {
+        // https://developer.apple.com/documentation/avfoundation/avplayer/volume
+        return player?.volume
+    }
+
     actual fun currentPlayerState(): GadulkaPlayerState? {
         return _state
     }

@@ -72,4 +72,8 @@ actual class GadulkaPlayer {
             MediaPlayer.Status.DISPOSED -> null
         }
     }
+
+    actual fun currentVolume(): Float? {
+        return playerState?.volume?.toFloat()
+    }
 }

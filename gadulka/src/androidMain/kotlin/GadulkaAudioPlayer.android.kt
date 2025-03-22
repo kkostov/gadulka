@@ -76,4 +76,11 @@ actual class GadulkaPlayer(private val context: Context) {
     actual fun stop() {
         mediaPlayer.pause()
     }
+
+    actual fun currentVolume(): Float? {
+       if(mediaPlayer.isCommandAvailable(Player.COMMAND_GET_VOLUME)) {
+           return mediaPlayer.volume
+       }
+       return null
+    }
 }

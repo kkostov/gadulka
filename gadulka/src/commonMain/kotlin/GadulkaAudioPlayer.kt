@@ -70,6 +70,14 @@ expect class GadulkaPlayer {
      * @return The current state like [PLAYING], [BUFFERING], [IDLE], [PAUASED].
      */
     fun currentPlayerState(): GadulkaPlayerState?
+
+    /**
+     * Retrieves the current volume level of the player.
+     *
+     * A value of 0.0 indicates silence. A value of 1.0 indicates full audio volume for the player instance.
+     * @return The current volume as a floating-point value, or null if it cannot be determined.
+     */
+    fun currentVolume(): Float?
 }
 
 
