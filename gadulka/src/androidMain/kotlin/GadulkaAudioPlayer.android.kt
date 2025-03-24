@@ -6,12 +6,15 @@ import android.net.Uri
 import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
 import androidx.media3.exoplayer.ExoPlayer
+import com.kdroid.androidcontextprovider.ContextProvider
 import kotlin.time.Duration
 import kotlin.time.DurationUnit
 import kotlin.time.toDuration
 
 @Suppress("EXPECT_ACTUAL_CLASSIFIERS_ARE_IN_BETA_WARNING")
 actual class GadulkaPlayer(private val context: Context) {
+    actual constructor() : this(ContextProvider.getContext())
+
     private val mediaPlayer = ExoPlayer.Builder(context).build()
 
     init {
@@ -55,6 +58,7 @@ actual class GadulkaPlayer(private val context: Context) {
         return null
     }
 
+    @androidx.media3.common.util.UnstableApi
     actual fun currentPlayerState(): GadulkaPlayerState? {
         if (mediaPlayer.isReleased) {
             return null

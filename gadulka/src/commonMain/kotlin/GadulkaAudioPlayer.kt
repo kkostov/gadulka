@@ -14,7 +14,7 @@ player.release()
 ```
  */
 @Suppress("EXPECT_ACTUAL_CLASSIFIERS_ARE_IN_BETA_WARNING")
-expect class GadulkaPlayer {
+expect class GadulkaPlayer() {
     /**
      * Start playback of the audio resource at the provided [url].
      *
