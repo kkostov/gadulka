@@ -1,0 +1,66 @@
+name: Docs
+
+on:
+  push:
+    branches: ["main"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "docs"
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@85e6279cec87321a52edac9c87bce653a07cf6c2
+      - name: Validate Gradle Wrapper
+        uses: gradle/actions/wrapper-validation@4a417b5b1a01db0b076987546b67f8de18e7d340
+      - uses: actions/cache@v3
+        with:
+          path: |
+            ~/.konan
+          key: ${{ runner.os }}-${{ hashFiles('**/.lock') }}
+      - name: Set up JDK 17
+        uses: actions/setup-java@799ee7c97e9721ef38d1a7e8486c39753b9d6102
+        with:
+          java-version: "17"
+          distribution: "temurin"
+      - name: Dokka Build
+        run: |
+          ./gradlew dokkaGeneratePublicationHtml
+
+      - name: WASM Example Build
+        run: |
+          ./gradlew :sample:composeApp:wasmJsBrowserDistribution
+
+      - name: Create GitHub Page
+        run: |
+          mkdir -p all/pages
+          cp -r gadulka/build/dokka/html/* all/pages
+          mkdir -p all/pages/wasm
+          cp -r sample/composeApp/build/dist/wasmJs/productionExecutable/* all/pages/wasm
+      - name: Upload artifact pour GitHub Pages
+        uses: actions/upload-pages-artifact@2d163be3ddce01512f3eea7ac5b7023b5d643ce1
+        with:
+          path: all/pages
+
+  publish:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: deploy to pages
+        id: deployment
+        uses: actions/deploy-pages@854d7aa1b99e4509c4d1b53d69b7ba4eaf39215a
+        with:
+          path: all/pages

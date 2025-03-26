@@ -7,6 +7,7 @@ plugins {
     alias(libs.plugins.androidLibrary)
     alias(libs.plugins.vanniktech.mavenPublish)
     alias(libs.plugins.osdetector)
+    alias(libs.plugins.dokka)
 }
 
 group = "eu.iamkonstantin.kotlin"

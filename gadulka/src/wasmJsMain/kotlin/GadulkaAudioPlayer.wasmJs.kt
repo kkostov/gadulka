@@ -3,9 +3,15 @@ package eu.iamkonstantin.kotlin.gadulka
 import kotlinx.browser.document
 import kotlinx.dom.appendElement
 import org.w3c.dom.HTMLAudioElement
+import kotlin.uuid.ExperimentalUuidApi
+import kotlin.uuid.Uuid
 
 @Suppress("EXPECT_ACTUAL_CLASSIFIERS_ARE_IN_BETA_WARNING")
-actual class GadulkaPlayer(val htmlId: String) {
+@OptIn(ExperimentalUuidApi::class)
+actual class GadulkaPlayer actual constructor() {
+
+    private val htmlId = Uuid.random().toString()
+
     actual fun play(url: String) {
         release()
         document.body?.appendElement("audio") {

@@ -47,7 +47,7 @@ import kotlin.time.Duration.Companion.seconds
 
 
 @Suppress("EXPECT_ACTUAL_CLASSIFIERS_ARE_IN_BETA_WARNING")
-actual class GadulkaPlayer {
+actual class GadulkaPlayer actual constructor() {
     private var player: AVPlayer? = null
     private var playerObserver: CupertinoAVPlayerObserver? = null
 

@@ -11,7 +11,7 @@ import kotlin.time.toDuration
 import kotlin.time.toJavaDuration
 
 @Suppress("EXPECT_ACTUAL_CLASSIFIERS_ARE_IN_BETA_WARNING")
-actual class GadulkaPlayer {
+actual class GadulkaPlayer actual constructor() {
     var playerState: MediaPlayer? = null
 
     init {

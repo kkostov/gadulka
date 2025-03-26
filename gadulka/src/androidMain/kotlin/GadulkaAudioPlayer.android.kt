@@ -1,31 +1,29 @@
 package eu.iamkonstantin.kotlin.gadulka
 
 import android.content.ContentResolver
-import android.content.Context
 import android.net.Uri
 import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
 import androidx.media3.exoplayer.ExoPlayer
 import com.kdroid.androidcontextprovider.ContextProvider
-import kotlin.time.Duration
-import kotlin.time.DurationUnit
-import kotlin.time.toDuration
 
 @Suppress("EXPECT_ACTUAL_CLASSIFIERS_ARE_IN_BETA_WARNING")
-actual class GadulkaPlayer(private val context: Context) {
-    actual constructor() : this(ContextProvider.getContext())
+actual class GadulkaPlayer actual constructor() {
 
-    private val mediaPlayer = ExoPlayer.Builder(context).build()
-
-    init {
-        mediaPlayer.prepare()
-    }
+    private var mediaPlayer = ExoPlayer.Builder(ContextProvider.getContext()).build()
 
     actual fun play(url: String) {
-        if (mediaPlayer.isPlaying) mediaPlayer.pause()
+        if (mediaPlayer.isPlaying) {
+            stop()
+        }
+
+        if (mediaPlayer.isCommandAvailable(Player.COMMAND_PREPARE)) mediaPlayer.prepare()
+
         val mediaItem = MediaItem.fromUri(url)
-        mediaPlayer.setMediaItem(mediaItem)
-        mediaPlayer.play()
+
+        if (mediaPlayer.isCommandAvailable(Player.COMMAND_SET_MEDIA_ITEM)) mediaPlayer.setMediaItem(mediaItem)
+
+        if(mediaPlayer.isCommandAvailable(Player.COMMAND_PLAY_PAUSE)) mediaPlayer.play()
     }
 
     actual fun play() {
@@ -77,7 +75,7 @@ actual class GadulkaPlayer(private val context: Context) {
     }
 
     actual fun release() {
-        mediaPlayer.pause()
+        mediaPlayer.stop()
         mediaPlayer.release()
     }
 
