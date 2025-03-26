@@ -13,5 +13,6 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "multiplatform-library-template"
+rootProject.name = "gadulka"
 include(":gadulka")
+include(":sample:composeApp")

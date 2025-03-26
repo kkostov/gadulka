@@ -7,10 +7,11 @@ plugins {
     alias(libs.plugins.androidLibrary)
     alias(libs.plugins.vanniktech.mavenPublish)
     alias(libs.plugins.osdetector)
+    alias(libs.plugins.dokka)
 }
 
 group = "eu.iamkonstantin.kotlin"
-version = "1.0.5"
+version = "0.0.603"
 
 kotlin {
     jvm()
@@ -68,8 +69,11 @@ kotlin {
             }
         }
 
-        androidMain.dependencies {
-            implementation(libs.androix.media3.exploplayer)
+        val androidMain by getting {
+            dependencies {
+                implementation(libs.androix.media3.exploplayer)
+                implementation(libs.androidcontextprovider)
+            }
         }
     }
 }

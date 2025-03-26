@@ -72,23 +72,6 @@ fun AudioPlayer(player: GadulkaPlayer = GadulkaPlayer()) {
 }
 ```
 
-### Android
-
-For Android, the player needs a reference to the android context.
-
-```kotlin
- GadulkaPlayer(LocalContext.current)
-```
-
-Or using Koin (or another DI library):
-
-```kotlin
-factory<GadulkaPlayer> {
-    GadulkaPlayer(androidContext())
-} onClose {
-    it?.release()
-}
-```
 
 **Et voilà, enjoy the library and feel free to open an issue with any questions, thoughts or comments you may have!**
 
