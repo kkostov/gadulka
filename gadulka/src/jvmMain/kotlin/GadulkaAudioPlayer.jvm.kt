@@ -98,6 +98,8 @@ actual class GadulkaPlayer actual constructor() {
     }
 
     actual fun seekTo(time: Long) {
+        pause()
         playerState?.seek(javafx.util.Duration.millis(time.toDouble()))
+        play()
     }
 }
