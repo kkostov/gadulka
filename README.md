@@ -109,6 +109,11 @@ fun AudioPlayer() {
 
 Additional methods to control volume, position and playback rate are [also available](https://gadulka.iamkonstantin.eu).
 
+
+📖 [Docs](https://gadulka.iamkonstantin.eu)
+
+🍿 [Demo (WASM)](https://gadulka.iamkonstantin.eu/wasm)
+
 ## About the name
 
 Gadulka [is a traditional Bulgarian](https://en.wikipedia.org/wiki/Gadulka) bowed string instrument. It's a tiny music
