@@ -20,10 +20,9 @@
 
 ## What is it?
 
-Gadulka is a minimalistic player library for Kotlin Multiplatform. It targets Android, jvm and iOS, allowing consumers
-to play audio files.
+Gadulka is a minimalistic audio player library for Kotlin Multiplatform.
 
-To achieve this, Gadulka wraps the native player functionality from each target in "headless" mode. That is, the library
+Gadulka wraps the native player functionality from each target in "headless" mode. That is, the library
 does not provide any UI (this will be up to you). You can read more about my motivations [here](https://iamkonstantin.eu/blog/meet-gadulka-a-minimalistic-player-library-for-kotlin-multiplatform/).
 
 ## Getting Started
@@ -31,7 +30,7 @@ does not provide any UI (this will be up to you). You can read more about my mot
 Gadulka is available from Maven Central at the following coordinates:
 
 ```
-implementation("eu.iamkonstantin.kotlin:gadulka:1.5.0")
+implementation("eu.iamkonstantin.kotlin:gadulka:1.6.0")
 ```
 
 ### Example
@@ -50,14 +49,13 @@ Example using Jetpack Compose:
 
 ```kotlin
 @Composable
-fun AudioPlayer(player: GadulkaPlayer = GadulkaPlayer()) {
-    val url = remember { mutableStateOf("https://download.samplelib.com/wav/sample-12s.wav") }
-
+fun AudioPlayer() {
+    val player = rememberGadulkaState()
     Row {
         Button(
             onClick = {
                 player.play(
-                    url
+                    "https://download.samplelib.com/wav/sample-12s.wav"
                 )
             }) {
             Text("Play")
@@ -74,6 +72,47 @@ fun AudioPlayer(player: GadulkaPlayer = GadulkaPlayer()) {
 
 
 **Et voilà, enjoy the library and feel free to open an issue with any questions, thoughts or comments you may have!**
+
+If you want to track the state of the player, Gadulka comes with a simple convenience function which queries the player state every 300ms:
+
+```kotlin
+@Composable
+fun AudioPlayer() {
+    val gadulka = rememberGadulkaLiveState()
+
+    Column {
+        Text(gadulka.state.name)
+
+        Text("Volume: ${gadulka.volume}")
+
+        Text("Position: ${gadulka.position / 1000}s / ${gadulka.duration / 1000}s")
+
+        Row {
+            Button(
+                onClick = {
+                    player.play(
+                        "https://download.samplelib.com/wav/sample-12s.wav"
+                    )
+                }) {
+                Text("Play")
+            }
+            Button(
+                onClick = {
+                    player.stop()
+                }) {
+                Text("Stop")
+            }
+        }
+    }
+}
+```
+
+Additional methods to control volume, position and playback rate are [also available](https://gadulka.iamkonstantin.eu).
+
+
+📖 [Docs](https://gadulka.iamkonstantin.eu)
+
+🍿 [Demo (WASM)](https://gadulka.iamkonstantin.eu/wasm)
 
 ## About the name
 
