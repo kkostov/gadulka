@@ -28,6 +28,8 @@ jobs:
             os: macos-latest
           - target: jvmTest
             os: ubuntu-latest
+          - target: jvmTest
+            os: windows-latest
           - target: testDebugUnitTest
             os: ubuntu-latest
           - target: testReleaseUnitTest
@@ -52,3 +54,28 @@ jobs:
         uses: gradle/gradle-build-action@ce999babab2de1c4b649dc15f0ee67e6246c994f
         with:
           arguments: ${{ matrix.target }}
+  buildexample:
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - uses: actions/checkout@85e6279cec87321a52edac9c87bce653a07cf6c2
+      - name: Validate Gradle Wrapper
+        uses: gradle/actions/wrapper-validation@4a417b5b1a01db0b076987546b67f8de18e7d340
+      - uses: actions/cache@v3
+        with:
+          path: |
+            ~/.konan
+          key: ${{ runner.os }}-${{ hashFiles('**/.lock') }}
+      - name: Set up JDK 17
+        uses: actions/setup-java@799ee7c97e9721ef38d1a7e8486c39753b9d6102
+        with:
+          java-version: "17"
+          distribution: "temurin"
+      - name: WASM Example Build
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          ./gradlew :sample:composeApp:wasmJsBrowserDistribution
