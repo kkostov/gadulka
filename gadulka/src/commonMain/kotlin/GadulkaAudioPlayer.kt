@@ -156,6 +156,14 @@ fun rememberGadulkaState(): GadulkaPlayer {
     return player
 }
 
+/**
+ * Creates and remembers an instance of [GadulkaLiveState] that monitors and updates the state,
+ * volume, position, and duration of a [GadulkaPlayer]. The player state is updated periodically
+ * and cleans up resources when no longer needed.
+ *
+ * @return A [GadulkaLiveState] object containing the player instance, its current state, volume,
+ * playback position, and duration.
+ */
 @Composable
 fun rememberGadulkaLiveState(): GadulkaLiveState {
     val player = remember { GadulkaPlayer() }
