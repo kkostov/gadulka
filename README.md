@@ -73,7 +73,8 @@ fun AudioPlayer() {
 
 **Et voilà, enjoy the library and feel free to open an issue with any questions, thoughts or comments you may have!**
 
-If you want to track the state of the player, Gadulka comes with a simple convenience function which queries the player state every 300ms:
+## Notes
+If you would like to track the state of the player (e.g. in a composable), Gadulka comes with a simple convenience function which queries the player state every 300ms:
 
 ```kotlin
 @Composable
