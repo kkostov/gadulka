@@ -78,6 +78,6 @@ jobs:
           java-version: "17"
           distribution: "temurin"
       - name: WASM Example Build
-        if: matrix.os == 'macos-latest'
+        if: matrix.os == 'ubuntu-latest'
         run: |
           ./gradlew :sample:composeApp:wasmJsBrowserDistribution
