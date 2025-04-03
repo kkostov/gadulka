@@ -5,10 +5,6 @@ import javafx.embed.swing.JFXPanel
 import javafx.scene.media.Media
 import javafx.scene.media.MediaPlayer
 import java.net.URI
-import kotlin.time.Duration
-import kotlin.time.DurationUnit
-import kotlin.time.toDuration
-import kotlin.time.toJavaDuration
 
 @Suppress("EXPECT_ACTUAL_CLASSIFIERS_ARE_IN_BETA_WARNING")
 actual class GadulkaPlayer actual constructor() {
@@ -21,23 +17,23 @@ actual class GadulkaPlayer actual constructor() {
 
     actual fun play(url: String) {
         release()
-
         Platform.runLater {
             try {
                 val media = Media(URI(url).toString())
                 playerState = MediaPlayer(media).apply {
                     setOnReady {
-                        println("Ready, playing..")
+                        println("Gadulka JVM: Player is ready")
                         play()
                     }
                     setOnEndOfMedia {
-                        println("End of media")
+                        println("Gadulka JVM: End of media event")
                     }
                     setOnError {
-                        println("Error occurred: ${this.error?.message}")
+                        println("Gadulka JVM: Error occurred: ${this.error?.message}")
                     }
                 }
             } catch (e: Exception) {
+                println("Gadulka JVM: Failed to play audio.")
                 e.printStackTrace()
             }
         }
@@ -48,6 +44,7 @@ actual class GadulkaPlayer actual constructor() {
     }
 
     actual fun release() {
+        playerState?.pause()
         playerState?.stop()
         playerState = null
     }

@@ -7,42 +7,10 @@ import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.useContents
 import platform.AVFAudio.AVAudioSession
 import platform.AVFAudio.AVAudioSessionCategoryPlayback
-import platform.AVFoundation.AVPlayer
-import platform.AVFoundation.currentTime
-import platform.AVFoundation.pause
-import platform.AVFoundation.play
-import platform.Foundation.NSURL
-import kotlinx.cinterop.useContents
 import platform.AVFoundation.*
-import platform.CoreGraphics.CGFloat
-import platform.CoreMedia.CMTime
-import platform.CoreMedia.CMTimeGetSeconds
-import platform.CoreMedia.CMTimeMakeWithSeconds
-import platform.Foundation.NSNotificationCenter
+import platform.CoreMedia.*
+import platform.Foundation.NSURL
 import platform.darwin.NSEC_PER_SEC
-import platform.darwin.dispatch_async
-import platform.darwin.dispatch_get_main_queue
-import kotlin.time.Duration
-import platform.AVFAudio.AVAudioSessionCategoryPlayback
-import platform.AVFAudio.setActive
-import platform.AVFoundation.AVPlayerItem
-import platform.AVFoundation.AVPlayerItemDidPlayToEndTimeNotification
-import platform.AVFoundation.AVPlayerTimeControlStatusPlaying
-import platform.AVFoundation.addPeriodicTimeObserverForInterval
-import platform.AVFoundation.currentItem
-import platform.AVFoundation.currentTime
-import platform.AVFoundation.duration
-import platform.AVFoundation.isPlaybackLikelyToKeepUp
-import platform.AVFoundation.pause
-import platform.AVFoundation.play
-import platform.AVFoundation.removeTimeObserver
-import platform.AVFoundation.replaceCurrentItemWithPlayerItem
-import platform.AVFoundation.seekToTime
-import platform.AVFoundation.timeControlStatus
-import platform.CoreMedia.CMTimeGetSeconds
-import platform.CoreMedia.CMTimeMake
-import platform.CoreMedia.CMTimeMakeWithSeconds
-import platform.Foundation.NSOperationQueue
 import kotlin.time.Duration.Companion.seconds
 
 
@@ -76,6 +44,7 @@ actual class GadulkaPlayer actual constructor() {
     actual fun stop() {
         player?.pause()
         player?.replaceCurrentItemWithPlayerItem(null)
+        _state = GadulkaPlayerState.IDLE
     }
 
     actual fun pause() {
@@ -84,7 +53,10 @@ actual class GadulkaPlayer actual constructor() {
 
     actual fun currentPosition(): Long? {
         try {
-            val currentTimeSeconds = player?.currentTime()?.useContents { this.value / this.timescale }
+            val currentTimeSeconds = player?.currentTime()?.useContents {
+                if (this.timescale == 0) return@useContents null
+                this.value / this.timescale
+            }
             if (currentTimeSeconds != null && currentTimeSeconds >= 0) {
                 return (currentTimeSeconds * 1000)
             }
@@ -95,10 +67,17 @@ actual class GadulkaPlayer actual constructor() {
         return null
     }
 
+    @OptIn(ExperimentalForeignApi::class)
     actual fun currentDuration(): Long? {
         player?.currentItem?.let {
-            val dur = it.duration.useContents { this.value.seconds }
-            return dur.inWholeMilliseconds
+            val dur = it.duration.useContents {
+                if (this != kCMTimeInvalid && this != kCMTimeIndefinite) {
+                    null
+                } else {
+                    this.value.seconds
+                }
+            }
+            return dur?.inWholeMilliseconds
         }
 
         return null
@@ -158,6 +137,7 @@ class CupertinoAVPlayerObserver(private val player: AVPlayer?) {
     // based on https://developer.apple.com/documentation/avfoundation/monitoring-playback-progress-in-your-app
     private lateinit var timeObserver: Any
 
+    @OptIn(ExperimentalForeignApi::class)
     fun attach(onAVPlayerUpdated: () -> Unit) {
         detach()
         if (player == null) return

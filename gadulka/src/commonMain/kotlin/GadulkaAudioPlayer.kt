@@ -1,5 +1,7 @@
 package eu.iamkonstantin.kotlin.gadulka
 
+import androidx.compose.runtime.*
+
 /**
  * A minimalistic audio player
  *
@@ -133,3 +135,66 @@ expect class GadulkaPlayer() {
  * @return `true` if the player is in the PLAYING or BUFFERING state, otherwise `false`.
  */
 fun GadulkaPlayer.isPlaying(): Boolean = currentPlayerState() in listOf(GadulkaPlayerState.PLAYING, GadulkaPlayerState.BUFFERING)
+
+
+/**
+ * Provides a stateful instance of [GadulkaPlayer] that is remembered across recompositions.
+ *
+ * The state is managed such that it is automatically released when the composable leaves the composition,
+ * ensuring proper cleanup of resources.
+ *
+ * @return A remembered instance of [GadulkaPlayer], which represents a minimalistic audio player.
+ */
+@Composable
+fun rememberGadulkaState(): GadulkaPlayer {
+    val player = remember { GadulkaPlayer() }
+    DisposableEffect(Unit) {
+        onDispose {
+            player.release()
+        }
+    }
+    return player
+}
+
+@Composable
+fun rememberGadulkaLiveState(): GadulkaLiveState {
+    val player = remember { GadulkaPlayer() }
+    var state by remember { mutableStateOf(GadulkaPlayerState.IDLE) }
+    var volume by remember { mutableStateOf(0f) }
+    var position by remember { mutableStateOf(0L) }
+    var duration by remember { mutableStateOf(0L) }
+
+    LaunchedEffect(Unit) {
+        while (true) {
+            // Fetch or update the data
+            state = player.currentPlayerState() ?: GadulkaPlayerState.IDLE
+            volume = player.currentVolume() ?: 0f
+            position = player.currentPosition() ?: 0L
+            duration = player.currentDuration() ?: 0L
+
+            // Delay for 300 milliseconds
+            kotlinx.coroutines.delay(300)
+        }
+    }
+
+    DisposableEffect(Unit) {
+        onDispose {
+            player.release()
+        }
+    }
+    return GadulkaLiveState(
+        player, state,
+        volume = volume,
+        position = position,
+        duration = duration
+    )
+}
+
+
+data class GadulkaLiveState(
+    val player: GadulkaPlayer,
+    val state: GadulkaPlayerState,
+    val volume: Float,
+    val position: Long,
+    val duration: Long
+)

@@ -51,7 +51,7 @@ actual class GadulkaPlayer actual constructor() {
 
     actual fun currentDuration(): Long? {
         if (mediaPlayer.isCommandAvailable(Player.COMMAND_GET_CURRENT_MEDIA_ITEM)) {
-            return mediaPlayer.duration
+            if (mediaPlayer.duration >= 0) return mediaPlayer.duration
         }
         return null
     }
