@@ -1,4 +1,5 @@
 import com.vanniktech.maven.publish.SonatypeHost
+import org.jetbrains.dokka.gradle.DokkaTask
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
@@ -117,4 +118,13 @@ mavenPublishing {
             url = "https://github.com/kkostov/gadulka"
         }
     }
+}
+
+tasks.withType<DokkaTask>().configureEach {
+    moduleName.set("Gadulka")
+    offlineMode.set(true)
+}
+
+tasks.register("dokkaHtml") {
+    dependsOn("dokkaGeneratePublicationHtml")
 }
