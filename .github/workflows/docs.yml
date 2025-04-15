@@ -41,12 +41,19 @@ jobs:
         run: |
           ./gradlew :sample:composeApp:wasmJsBrowserDistribution
 
+      - name: SBOM
+        run: |
+          ./gradlew :gadulka:cyclonedxBom
+
       - name: Create GitHub Page
         run: |
           mkdir -p all/pages
           cp -r gadulka/build/dokka/html/* all/pages
           mkdir -p all/pages/wasm
           cp -r sample/composeApp/build/dist/wasmJs/productionExecutable/* all/pages/wasm
+          mkdir -p all/pages/sbom
+          cp gadulka/build/reports/bom.xml all/pages/sbom/bom.xml
+          cp gadulka/build/reports/bom.json all/pages/sbom/bom.json
       - name: Upload artifact pour GitHub Pages
         uses: actions/upload-pages-artifact@2d163be3ddce01512f3eea7ac5b7023b5d643ce1
         with:

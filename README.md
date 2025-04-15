@@ -135,3 +135,12 @@ This is a permissive license which allows for any type of use, provided the copy
 This library project was initially created
 from [JetBrains's Library Template](https://github.com/Kotlin/multiplatform-library-template) under the Apache 2.0
 license.
+
+
+### Dependencies
+To achieve its purpose, Gadulka relies on a number of libraries. A SBOM report is available in [JSON](https://gadulka.iamkonstantin.eu/sbom/bom.json) and [XML](https://gadulka.iamkonstantin.eu/sbom/bom.xml) for a complete list.   
+
+Specific license terms:
+
+* [Kotlin Native by JetBrains](https://kotlinlang.org/docs/native-binary-licenses.html)
+* [JavaFX](https://github.com/openjdk/jfx/blob/master/LICENSE) linked under the class path exception allowing distribution as commercial and closed-source applications without additional copyleft obligations.
