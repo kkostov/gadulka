@@ -1,3 +1,8 @@
+/*
+ * Copyright 2025 Konstantin <hi@iamkonstantin.eu>.
+ *  Use of this source code is governed by the BSD 3-Clause License that can be found in LICENSE file.
+ */
+
 import com.vanniktech.maven.publish.SonatypeHost
 import org.jetbrains.dokka.gradle.DokkaTask
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
