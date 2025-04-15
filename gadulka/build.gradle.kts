@@ -11,6 +11,7 @@ plugins {
     alias(libs.plugins.vanniktech.mavenPublish)
     alias(libs.plugins.osdetector)
     alias(libs.plugins.dokka)
+    alias(libs.plugins.cyclonedx.bom)
 }
 
 group = "eu.iamkonstantin.kotlin"

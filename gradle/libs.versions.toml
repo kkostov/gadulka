@@ -19,6 +19,7 @@ androidx-test-junit = "1.2.1"
 junit = "4.13.2"
 kotlinx-coroutines = "1.10.1"
 dokka = "2.0.0"
+cyclonedx = "2.2.0"
 
 [libraries]
 androidcontextprovider = { module = "io.github.kdroidfilter:androidcontextprovider", version.ref = "androidcontextprovider" }
@@ -47,3 +48,4 @@ osdetector = { id = "com.google.osdetector", version = "1.7.3" }
 composeMultiplatform = { id = "org.jetbrains.compose", version.ref = "compose-multiplatform" }
 composeCompiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 dokka = { id = "org.jetbrains.dokka", version.ref = "dokka" }
+cyclonedx-bom = {id = "org.cyclonedx.bom", version.ref = "cyclonedx"}
