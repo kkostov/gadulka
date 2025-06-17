@@ -28,7 +28,7 @@ kotlin {
         publishLibraryVariants("release")
         @OptIn(ExperimentalKotlinGradlePluginApi::class)
         compilerOptions {
-            jvmTarget.set(JvmTarget.JVM_1_8)
+            jvmTarget.set(JvmTarget.JVM_11)
         }
     }
     iosX64()
@@ -60,16 +60,17 @@ kotlin {
                     "linux-x86_64" -> "linux"
                     "linux-aarch_64" -> "linux-aarch64"
                     "windows-x86_64" -> "win"
+                    "windows-aarch_64" -> "win-aarch64"
                     "osx-x86_64" -> "mac"
                     "osx-aarch_64" -> "mac-aarch64"
                     else -> throw IllegalStateException("Unknown OS: ${osdetector.classifier}")
                 }
-                implementation("org.openjfx:javafx-base:19:${fxSuffix}")
-                implementation("org.openjfx:javafx-graphics:19:${fxSuffix}")
-                implementation("org.openjfx:javafx-controls:19:${fxSuffix}")
-                implementation("org.openjfx:javafx-swing:19:${fxSuffix}")
-                implementation("org.openjfx:javafx-web:19:${fxSuffix}")
-                implementation("org.openjfx:javafx-media:19:${fxSuffix}")
+                implementation("org.openjfx:javafx-base:23:${fxSuffix}")
+                implementation("org.openjfx:javafx-graphics:23:${fxSuffix}")
+                implementation("org.openjfx:javafx-controls:23:${fxSuffix}")
+                implementation("org.openjfx:javafx-swing:23:${fxSuffix}")
+                implementation("org.openjfx:javafx-web:23:${fxSuffix}")
+                implementation("org.openjfx:javafx-media:23:${fxSuffix}")
             }
         }
 

@@ -30,7 +30,7 @@ does not provide any UI (this will be up to you). You can read more about my mot
 Gadulka is available from Maven Central at the following coordinates:
 
 ```
-implementation("eu.iamkonstantin.kotlin:gadulka:1.6.3")
+implementation("eu.iamkonstantin.kotlin:gadulka:1.7.0")
 ```
 
 ### Example
@@ -110,6 +110,29 @@ fun AudioPlayer() {
 
 Additional methods to control volume, position and playback rate are [also available](https://gadulka.iamkonstantin.eu).
 
+
+Gadulka links against but doesn't bundle JavaFX. You may need to adapt your gradle file to add the corresponding dependencies e.g.:
+
+```kotlin
+val jvmMain by getting {
+    dependencies {
+        val fxSuffix = when (osdetector.classifier) {
+            "linux-x86_64" -> "linux"
+            "linux-aarch_64" -> "linux-aarch64"
+            "windows-x86_64" -> "win"
+            "osx-x86_64" -> "mac"
+            "osx-aarch_64" -> "mac-aarch64"
+            else -> throw IllegalStateException("Unknown OS: ${osdetector.classifier}")
+        }
+        implementation("org.openjfx:javafx-base:23:${fxSuffix}")
+        implementation("org.openjfx:javafx-graphics:23:${fxSuffix}")
+        implementation("org.openjfx:javafx-controls:23:${fxSuffix}")
+        implementation("org.openjfx:javafx-swing:23:${fxSuffix}")
+        implementation("org.openjfx:javafx-web:23:${fxSuffix}")
+        implementation("org.openjfx:javafx-media:23:${fxSuffix}")
+    }
+}
+```
 
 📖 [Docs](https://gadulka.iamkonstantin.eu)
 
