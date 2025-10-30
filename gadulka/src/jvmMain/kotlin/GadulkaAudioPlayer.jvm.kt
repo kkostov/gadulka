@@ -9,11 +9,14 @@ import javafx.application.Platform
 import javafx.embed.swing.JFXPanel
 import javafx.scene.media.Media
 import javafx.scene.media.MediaPlayer
+import javafx.util.Duration
 import java.net.URI
 
 @Suppress("EXPECT_ACTUAL_CLASSIFIERS_ARE_IN_BETA_WARNING")
 actual class GadulkaPlayer actual constructor() {
     var playerState: MediaPlayer? = null
+    private var lastVolume: Double? = null
+    private var lastRate: Double? = null
 
     init {
         // Ensure JavaFX runtime is initialized
@@ -32,6 +35,12 @@ actual class GadulkaPlayer actual constructor() {
                     }
                     setOnEndOfMedia {
                         println("Gadulka JVM: End of media event")
+                        Platform.runLater {
+                            try {
+                                this@GadulkaPlayer.playerState?.stop()
+                                this@GadulkaPlayer.playerState?.seek(Duration.ZERO)
+                            } catch (_: Exception) { }
+                        }
                     }
                     setOnError {
                         println("Gadulka JVM: Error occurred: ${this.error?.message}")
@@ -45,7 +54,24 @@ actual class GadulkaPlayer actual constructor() {
     }
 
     actual fun play() {
-        playerState?.play()
+        Platform.runLater {
+            // Fix seeking issues (when currentTime exceeds duration)
+            val atEnd = try {
+                val ct = playerState?.currentTime?.toMillis() ?: -1.0
+                val dt = playerState?.media?.duration?.toMillis() ?: -1.0
+                ct >= 0 && dt >= 0 && ct >= dt
+            } catch (_: Exception) { false }
+
+            if (currentPlayerState() == GadulkaPlayerState.IDLE || atEnd)
+                playerState?.seek(Duration.ZERO)
+
+            playerState?.play()
+            lastVolume?.let { playerState?.volume = it }
+            lastRate?.let {
+                playerState?.rate = 1.0     // Workaround, see: https://stackoverflow.com/a/79324478
+                playerState?.rate = it
+            }
+        }
     }
 
     actual fun release() {
@@ -81,7 +107,7 @@ actual class GadulkaPlayer actual constructor() {
             MediaPlayer.Status.PAUSED -> GadulkaPlayerState.PAUSED
             MediaPlayer.Status.PLAYING -> GadulkaPlayerState.PLAYING
             MediaPlayer.Status.STOPPED -> GadulkaPlayerState.IDLE
-            MediaPlayer.Status.STALLED -> GadulkaPlayerState.IDLE
+            MediaPlayer.Status.STALLED -> GadulkaPlayerState.BUFFERING
             MediaPlayer.Status.HALTED -> GadulkaPlayerState.IDLE
             MediaPlayer.Status.DISPOSED -> null
         }
@@ -92,16 +118,18 @@ actual class GadulkaPlayer actual constructor() {
     }
 
     actual fun setVolume(volume: Float) {
-        playerState?.volume = volume.toDouble()
+        lastVolume = volume.toDouble()
+        playerState?.volume = lastVolume!!
     }
 
     actual fun setRate(rate: Float) {
-        playerState?.rate = rate.toDouble()
+        lastRate = rate.toDouble()
+        playerState?.rate = lastRate!!
     }
 
     actual fun seekTo(time: Long) {
-        pause()
-        playerState?.seek(javafx.util.Duration.millis(time.toDouble()))
-        play()
+        Platform.runLater {
+            playerState?.seek(Duration.millis(time.toDouble()))
+        }
     }
 }
