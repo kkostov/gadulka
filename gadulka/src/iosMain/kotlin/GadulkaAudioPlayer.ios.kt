@@ -14,28 +14,45 @@ import platform.AVFAudio.AVAudioSession
 import platform.AVFAudio.AVAudioSessionCategoryPlayback
 import platform.AVFoundation.*
 import platform.CoreMedia.*
+import platform.Foundation.NSNotificationCenter
 import platform.Foundation.NSURL
 import platform.darwin.NSEC_PER_SEC
-import kotlin.time.Duration.Companion.seconds
-
 
 @Suppress("EXPECT_ACTUAL_CLASSIFIERS_ARE_IN_BETA_WARNING")
 actual class GadulkaPlayer actual constructor() {
     private var player: AVPlayer? = null
     private var playerObserver: CupertinoAVPlayerObserver? = null
+    private var lastVolume: Float? = null
+    private var lastRate: Float? = null
 
     actual fun play(url: String) {
         release()
         AVAudioSession.sharedInstance().setCategory(AVAudioSessionCategoryPlayback, null)
         val nsUrl = NSURL(string = url)
-        player = AVPlayer.playerWithURL(nsUrl)
+        val asset = AVURLAsset(uRL = nsUrl, options = mapOf(AVURLAssetPreferPreciseDurationAndTimingKey to true))
+        val item = AVPlayerItem(asset = asset, automaticallyLoadedAssetKeys = listOf("duration", "playable"))
+
+        if (player == null)
+            player = AVPlayer.playerWithPlayerItem(item)
+        else
+            player!!.replaceCurrentItemWithPlayerItem(item)
+
+        lastVolume?.let { player?.volume = it }
+
         setup()
         player?.play()
+        lastRate?.let { player?.rate = it }
     }
 
     actual fun play() {
         // https://developer.apple.com/documentation/avfoundation/avplayer/play()
-        player?.play()
+        if (player?.currentItem != null) {
+            if (currentPlayerState() == GadulkaPlayerState.IDLE)
+                seekTo(0)
+            player?.play()
+            lastVolume?.let { player?.volume = it }
+            lastRate?.let { player?.rate = it }
+        }
     }
 
 
@@ -72,18 +89,18 @@ actual class GadulkaPlayer actual constructor() {
         return null
     }
 
-    @OptIn(ExperimentalForeignApi::class)
     actual fun currentDuration(): Long? {
-        player?.currentItem?.let {
-            val dur = it.duration.useContents {
-                if (this != kCMTimeInvalid && this != kCMTimeIndefinite) {
-                    null
-                } else {
-                    this.value.seconds
-                }
-            }
-            return dur?.inWholeMilliseconds
-        }
+        val item = player?.currentItem ?: return null
+        val itemSeconds = CMTimeGetSeconds(item.duration)
+
+        // Try player item's duration
+        if (!itemSeconds.isNaN() && !itemSeconds.isInfinite() && itemSeconds >= 0)
+            return (itemSeconds * 1000.0).toLong()
+
+        // Fallback to underlying asset's duration
+        val assetSeconds = CMTimeGetSeconds(item.asset.duration)
+        if (!assetSeconds.isNaN() && !assetSeconds.isInfinite() && assetSeconds >= 0)
+            return (assetSeconds * 1000.0).toLong()
 
         return null
     }
@@ -94,11 +111,13 @@ actual class GadulkaPlayer actual constructor() {
     }
 
     actual fun setVolume(volume: Float) {
+        lastVolume = volume
         player?.volume = volume
     }
 
     actual fun setRate(rate: Float) {
         // https://developer.apple.com/documentation/avfoundation/controlling-the-transport-behavior-of-a-player#Control-the-playback-rate
+        lastRate = rate
         player?.rate = rate
     }
 
@@ -116,43 +135,88 @@ actual class GadulkaPlayer actual constructor() {
     private var _state: GadulkaPlayerState? = null
 
 
-
     private fun setup() {
+        playerObserver?.detach()
+
         val observer = CupertinoAVPlayerObserver(player)
-        observer.attach {
-            val rate: Float = player?.rate ?: 0f
-            val hasItem = player?.currentItem != null
-            val avStatus = player?.currentItem?.status
-            val bufferingEnding = player?.currentItem?.isPlaybackLikelyToKeepUp() == true
-            val bufferIsEmpty = player?.currentItem?.isPlaybackBufferEmpty() == true
-            // https://developer.apple.com/documentation/avfoundation/avplayer/timecontrolstatus-swift.property/#Discussion
-            val waitingToPlayAtRate = player?.timeControlStatus == AVPlayerTimeControlStatusWaitingToPlayAtSpecifiedRate
-            _state = when {
-                rate > 0 -> GadulkaPlayerState.PLAYING
-                !hasItem -> GadulkaPlayerState.IDLE
-                avStatus == AVPlayerItemStatusFailed -> GadulkaPlayerState.IDLE
-                !bufferingEnding || bufferIsEmpty || waitingToPlayAtRate -> GadulkaPlayerState.BUFFERING
-                else -> GadulkaPlayerState.PAUSED
-            }
-        }
+        observer.attach(
+            onAVPlayerUpdated = {
+                val rate: Float = player?.rate ?: 0f
+                val hasItem = player?.currentItem != null
+                val avStatus = player?.currentItem?.status
+                val bufferingEnding = player?.currentItem?.isPlaybackLikelyToKeepUp() == true
+                val bufferIsEmpty = player?.currentItem?.isPlaybackBufferEmpty() == true
+                // https://developer.apple.com/documentation/avfoundation/avplayer/timecontrolstatus-swift.property/#Discussion
+                val waitingToPlayAtRate =
+                    player?.timeControlStatus == AVPlayerTimeControlStatusWaitingToPlayAtSpecifiedRate
+                _state = when {
+                    rate > 0 -> GadulkaPlayerState.PLAYING
+                    !hasItem -> GadulkaPlayerState.IDLE
+                    avStatus == AVPlayerItemStatusFailed -> GadulkaPlayerState.IDLE
+                    !bufferingEnding || bufferIsEmpty || waitingToPlayAtRate -> GadulkaPlayerState.BUFFERING
+                    else -> GadulkaPlayerState.PAUSED
+                }
+            },
+            onAVPlayerEnded = {
+                _state = GadulkaPlayerState.IDLE
+            },
+            onAVPlayerStalled = {
+                _state = GadulkaPlayerState.BUFFERING
+            },
+        )
+
+        playerObserver = observer
     }
 }
 
 class CupertinoAVPlayerObserver(private val player: AVPlayer?) {
     // based on https://developer.apple.com/documentation/avfoundation/monitoring-playback-progress-in-your-app
-    private lateinit var timeObserver: Any
+    private var timeObserver: Any? = null
+    private var endObserver: Any? = null
+    private var stallObserver: Any? = null
 
     @OptIn(ExperimentalForeignApi::class)
-    fun attach(onAVPlayerUpdated: () -> Unit) {
+    fun attach(
+        onAVPlayerUpdated: () -> Unit,
+        onAVPlayerEnded: () -> Unit,
+        onAVPlayerStalled: () -> Unit,
+    ) {
         detach()
         if (player == null) return
+
+        // Buffering state
+        onAVPlayerUpdated()
+
         val interval = CMTimeMakeWithSeconds(0.5, NSEC_PER_SEC.toInt()) // update every ~0.5 seconds
         timeObserver = player.addPeriodicTimeObserverForInterval(interval, null) { _: CValue<CMTime> ->
             onAVPlayerUpdated()
         }
+
+        player.currentItem?.let { item ->
+            endObserver = NSNotificationCenter.defaultCenter.addObserverForName(
+                name = AVPlayerItemDidPlayToEndTimeNotification,
+                `object` = item,
+                queue = null,
+            ) { _ ->
+                onAVPlayerEnded()
+            }
+
+            stallObserver = NSNotificationCenter.defaultCenter.addObserverForName(
+                name = AVPlayerItemPlaybackStalledNotification,
+                `object` = item,
+                queue = null,
+            ) { _ ->
+                onAVPlayerStalled()
+            }
+        }
     }
 
     fun detach() {
-        if (::timeObserver.isInitialized) player?.removeTimeObserver(timeObserver)
+        timeObserver?.let { player?.removeTimeObserver(it) }
+        timeObserver = null
+        endObserver?.let { NSNotificationCenter.defaultCenter.removeObserver(it) }
+        endObserver = null
+        stallObserver?.let { NSNotificationCenter.defaultCenter.removeObserver(it) }
+        stallObserver = null
     }
 }

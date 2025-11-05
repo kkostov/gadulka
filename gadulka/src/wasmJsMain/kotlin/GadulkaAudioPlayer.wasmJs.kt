@@ -8,6 +8,7 @@ package eu.iamkonstantin.kotlin.gadulka
 import kotlinx.browser.document
 import kotlinx.dom.appendElement
 import org.w3c.dom.HTMLAudioElement
+import org.w3c.dom.events.Event
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
@@ -16,6 +17,39 @@ import kotlin.uuid.Uuid
 actual class GadulkaPlayer actual constructor() {
 
     private val htmlId = Uuid.random().toString()
+    private var _state: GadulkaPlayerState? = GadulkaPlayerState.IDLE
+    private val events = mutableListOf<() -> Unit>()
+    private var lastVolume: Double? = null
+    private var lastRate: Double? = null
+
+    private fun attachEventListeners(el: HTMLAudioElement) {
+        detachEventListeners()
+
+        val onPlaying: (Event) -> Unit = { _state = GadulkaPlayerState.PLAYING }
+        val onPlay: (Event) -> Unit = { _state = GadulkaPlayerState.PLAYING }
+        val onPause: (Event) -> Unit = { _state = GadulkaPlayerState.PAUSED }
+        val onEnded: (Event) -> Unit = { _state = GadulkaPlayerState.IDLE }
+        val onWaiting: (Event) -> Unit = { _state = GadulkaPlayerState.BUFFERING }
+        val onStalled: (Event) -> Unit = { _state = GadulkaPlayerState.BUFFERING }
+
+        el.addEventListener("playing", onPlaying)
+        events += { el.removeEventListener("playing", onPlaying) }
+        el.addEventListener("play", onPlay)
+        events += { el.removeEventListener("play", onPlay) }
+        el.addEventListener("pause", onPause)
+        events += { el.removeEventListener("pause", onPause) }
+        el.addEventListener("ended", onEnded)
+        events += { el.removeEventListener("ended", onEnded) }
+        el.addEventListener("waiting", onWaiting)
+        events += { el.removeEventListener("waiting", onWaiting) }
+        el.addEventListener("stalled", onStalled)
+        events += { el.removeEventListener("stalled", onStalled) }
+    }
+
+    private fun detachEventListeners() {
+        events.forEach { it.invoke() }
+        events.clear()
+    }
 
     actual fun play(url: String) {
         release()
@@ -26,20 +60,27 @@ actual class GadulkaPlayer actual constructor() {
         }
 
         val playerEl = getPlayerElement()
+        playerEl?.let { attachEventListeners(it) }
         playerEl?.play()
+        lastVolume?.let { getPlayerElement()?.volume = it }
+        lastRate?.let { getPlayerElement()?.playbackRate = it }
     }
 
     actual fun play() {
         getPlayerElement()?.play()
+        lastVolume?.let { getPlayerElement()?.volume = it }
+        lastRate?.let { getPlayerElement()?.playbackRate = it }
     }
 
     actual fun stop() {
         getPlayerElement()?.pause()
         getPlayerElement()?.currentTime = 0.0
+        _state = GadulkaPlayerState.IDLE
     }
 
     actual fun pause() {
         getPlayerElement()?.pause()
+        _state = GadulkaPlayerState.PAUSED
     }
 
     /**
@@ -49,6 +90,8 @@ actual class GadulkaPlayer actual constructor() {
         val playerEl = getPlayerElement()
         playerEl?.pause()
         playerEl?.remove()
+        detachEventListeners()
+        _state = null
     }
 
     private fun getPlayerElement(): HTMLAudioElement? {
@@ -74,9 +117,8 @@ actual class GadulkaPlayer actual constructor() {
     }
 
     actual fun currentPlayerState(): GadulkaPlayerState? {
-        // todo: observe the player events
         // https://developer.mozilla.org/en-US/docs/Web/HTML/Element/audio#events
-        return null
+        return _state
     }
 
     actual fun currentVolume(): Float? {
@@ -87,18 +129,20 @@ actual class GadulkaPlayer actual constructor() {
 
     actual fun setVolume(volume: Float) {
         // https://developer.mozilla.org/en-US/docs/Web/API/HTMLMediaElement/volume
-        getPlayerElement()?.volume = volume.toDouble()
+        lastVolume = volume.toDouble()
+        getPlayerElement()?.volume = lastVolume!!
     }
 
     actual fun setRate(rate: Float) {
         // https://developer.mozilla.org/en-US/docs/Web/API/HTMLMediaElement/playbackRate
         // Web browsers may choose to mute playback if rate is outside the useful range
         // Acceptable values are 0.25 to 4.0
-        getPlayerElement()?.playbackRate = rate.toDouble()
+        lastRate = rate.toDouble()
+        getPlayerElement()?.playbackRate = lastRate!!
     }
 
     actual fun seekTo(time: Long) {
         // https://developer.mozilla.org/en-US/docs/Web/API/HTMLMediaElement/currentTime
-        getPlayerElement()?.currentTime = time.toDouble()
+        getPlayerElement()?.currentTime = time.toDouble() / 1000.0
     }
 }

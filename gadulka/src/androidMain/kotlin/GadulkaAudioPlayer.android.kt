@@ -7,8 +7,10 @@ package eu.iamkonstantin.kotlin.gadulka
 
 import android.content.ContentResolver
 import android.net.Uri
+import androidx.annotation.OptIn
 import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
+import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.ExoPlayer
 import com.kdroid.androidcontextprovider.ContextProvider
 
@@ -31,8 +33,13 @@ actual class GadulkaPlayer actual constructor() {
         if(mediaPlayer.isCommandAvailable(Player.COMMAND_PLAY_PAUSE)) mediaPlayer.play()
     }
 
+    @OptIn(UnstableApi::class)
     actual fun play() {
-        if(mediaPlayer.isCommandAvailable(Player.COMMAND_PLAY_PAUSE)) mediaPlayer.play()
+        if(mediaPlayer.isCommandAvailable(Player.COMMAND_PLAY_PAUSE)) {
+            if (currentPlayerState() == GadulkaPlayerState.IDLE)
+                seekTo(0)
+            mediaPlayer.play()
+        }
     }
 
 
@@ -61,7 +68,7 @@ actual class GadulkaPlayer actual constructor() {
         return null
     }
 
-    @androidx.media3.common.util.UnstableApi
+    @UnstableApi
     actual fun currentPlayerState(): GadulkaPlayerState? {
         if (mediaPlayer.isReleased) {
             return null
