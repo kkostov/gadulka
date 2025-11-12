@@ -17,6 +17,7 @@ actual class GadulkaPlayer actual constructor() {
     var playerState: MediaPlayer? = null
     private var lastVolume: Double? = null
     private var lastRate: Double? = null
+    private var errorListener: ErrorListener? = null
 
     init {
         // Ensure JavaFX runtime is initialized
@@ -43,10 +44,12 @@ actual class GadulkaPlayer actual constructor() {
                         }
                     }
                     setOnError {
+                        errorListener?.onError(this.error?.message)
                         println("Gadulka JVM: Error occurred: ${this.error?.message}")
                     }
                 }
             } catch (e: Exception) {
+                errorListener?.onError(e.message)
                 println("Gadulka JVM: Failed to play audio.")
                 e.printStackTrace()
             }
@@ -131,5 +134,9 @@ actual class GadulkaPlayer actual constructor() {
         Platform.runLater {
             playerState?.seek(Duration.millis(time.toDouble()))
         }
+    }
+
+    actual fun setOnErrorListener(listener: ErrorListener) {
+        errorListener = listener
     }
 }

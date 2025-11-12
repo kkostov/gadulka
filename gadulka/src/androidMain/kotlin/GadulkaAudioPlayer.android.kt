@@ -9,6 +9,7 @@ import android.content.ContentResolver
 import android.net.Uri
 import androidx.annotation.OptIn
 import androidx.media3.common.MediaItem
+import androidx.media3.common.PlaybackException
 import androidx.media3.common.Player
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.ExoPlayer
@@ -18,6 +19,11 @@ import com.kdroid.androidcontextprovider.ContextProvider
 actual class GadulkaPlayer actual constructor() {
 
     private var mediaPlayer = ExoPlayer.Builder(ContextProvider.getContext()).build()
+    private var errorListener: ErrorListener? = null
+
+    init {
+        setup()
+    }
 
     actual fun play(url: String) {
         if (mediaPlayer.isPlaying) {
@@ -119,5 +125,20 @@ actual class GadulkaPlayer actual constructor() {
     actual fun seekTo(time: Long) {
         if (!mediaPlayer.isCommandAvailable(Player.COMMAND_SEEK_IN_CURRENT_MEDIA_ITEM)) return
         mediaPlayer.seekTo(time)
+    }
+
+    actual fun setOnErrorListener(listener: ErrorListener){
+        errorListener = listener
+    }
+
+    private fun setup() {
+
+        mediaPlayer.addListener(object :Player.Listener{
+            override fun onPlayerError(error: PlaybackException) {
+                errorListener?.onError(error.errorCodeName)
+                super.onPlayerError(error)
+            }
+        })
+
     }
 }
