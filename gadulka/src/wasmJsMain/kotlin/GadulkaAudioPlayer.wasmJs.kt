@@ -21,6 +21,7 @@ actual class GadulkaPlayer actual constructor() {
     private val events = mutableListOf<() -> Unit>()
     private var lastVolume: Double? = null
     private var lastRate: Double? = null
+    private var errorListener: ErrorListener? = null
 
     private fun attachEventListeners(el: HTMLAudioElement) {
         detachEventListeners()
@@ -31,6 +32,7 @@ actual class GadulkaPlayer actual constructor() {
         val onEnded: (Event) -> Unit = { _state = GadulkaPlayerState.IDLE }
         val onWaiting: (Event) -> Unit = { _state = GadulkaPlayerState.BUFFERING }
         val onStalled: (Event) -> Unit = { _state = GadulkaPlayerState.BUFFERING }
+        val onError: (Event) -> Unit = { errorListener?.onError(null) }
 
         el.addEventListener("playing", onPlaying)
         events += { el.removeEventListener("playing", onPlaying) }
@@ -44,6 +46,8 @@ actual class GadulkaPlayer actual constructor() {
         events += { el.removeEventListener("waiting", onWaiting) }
         el.addEventListener("stalled", onStalled)
         events += { el.removeEventListener("stalled", onStalled) }
+        el.addEventListener("error", onError)
+        events += { el.removeEventListener("error", onError) }
     }
 
     private fun detachEventListeners() {
@@ -144,5 +148,9 @@ actual class GadulkaPlayer actual constructor() {
     actual fun seekTo(time: Long) {
         // https://developer.mozilla.org/en-US/docs/Web/API/HTMLMediaElement/currentTime
         getPlayerElement()?.currentTime = time.toDouble() / 1000.0
+    }
+
+    actual fun setOnErrorListener(listener: ErrorListener) {
+        errorListener = listener
     }
 }

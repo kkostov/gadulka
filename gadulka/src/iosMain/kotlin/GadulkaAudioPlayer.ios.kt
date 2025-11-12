@@ -22,6 +22,7 @@ import platform.darwin.NSEC_PER_SEC
 actual class GadulkaPlayer actual constructor() {
     private var player: AVPlayer? = null
     private var playerObserver: CupertinoAVPlayerObserver? = null
+    private var errorListener: ErrorListener? = null
     private var lastVolume: Float? = null
     private var lastRate: Float? = null
 
@@ -163,9 +164,16 @@ actual class GadulkaPlayer actual constructor() {
             onAVPlayerStalled = {
                 _state = GadulkaPlayerState.BUFFERING
             },
+            onAVPlayerError = {
+                errorListener?.onError(it)
+            }
         )
 
         playerObserver = observer
+    }
+
+    actual fun setOnErrorListener(listener: ErrorListener) {
+        errorListener = listener
     }
 }
 
@@ -174,12 +182,14 @@ class CupertinoAVPlayerObserver(private val player: AVPlayer?) {
     private var timeObserver: Any? = null
     private var endObserver: Any? = null
     private var stallObserver: Any? = null
+    private var errorObserver: Any? = null
 
     @OptIn(ExperimentalForeignApi::class)
     fun attach(
         onAVPlayerUpdated: () -> Unit,
         onAVPlayerEnded: () -> Unit,
         onAVPlayerStalled: () -> Unit,
+        onAVPlayerError: (message: String) -> Unit
     ) {
         detach()
         if (player == null) return
@@ -208,6 +218,17 @@ class CupertinoAVPlayerObserver(private val player: AVPlayer?) {
             ) { _ ->
                 onAVPlayerStalled()
             }
+
+            errorObserver = NSNotificationCenter.defaultCenter.addObserverForName(
+                name = AVPlayerItemFailedToPlayToEndTimeNotification,
+                `object` = item,
+                queue = null,
+            ) { notification ->
+                val error = notification?.userInfo?.get(AVPlayerItemFailedToPlayToEndTimeErrorKey) as? String
+                onAVPlayerError(error?:"Not available")
+            }
+
+
         }
     }
 
@@ -218,5 +239,7 @@ class CupertinoAVPlayerObserver(private val player: AVPlayer?) {
         endObserver = null
         stallObserver?.let { NSNotificationCenter.defaultCenter.removeObserver(it) }
         stallObserver = null
+        errorObserver?.let { NSNotificationCenter.defaultCenter.removeObserver(it) }
+        errorObserver = null
     }
 }

@@ -131,6 +131,8 @@ expect class GadulkaPlayer() {
      * @param time The desired playback position in milliseconds. Must be within the duration of the media.
      */
     fun seekTo(time: Long)
+
+    fun setOnErrorListener(listener: ErrorListener)
 }
 
 
