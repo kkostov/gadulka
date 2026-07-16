@@ -1,4 +1,4 @@
-package eu.iamkonstantin.gadulkaplayer
+package eu.iamkonstantin.gadulkaplayer.di
 
 import android.os.Environment
 import co.touchlab.kermit.LogWriter
@@ -10,9 +10,6 @@ import java.io.FileOutputStream
 actual fun getPlatformLogWriters(homeDirectoryPath: String, logFileName: String): List<LogWriter> {
     val downloadFolder = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
     val logFile = File(downloadFolder, "logs.txt")
-
-    // WICHTIG: Du brauchst WRITE_EXTERNAL_STORAGE Permissions in der AndroidManifest.xml
-    // und musst diese zur Laufzeit anfragen, wenn du in den Download-Ordner willst.
 
     return listOf(
         LogcatWriter(), // Immer parallel Logcat behalten!
@@ -26,7 +23,8 @@ class FileLogWriter(private val logFile: File) : LogWriter() {
         try {
             FileOutputStream(logFile, true).use { it.write(logEntry.toByteArray()) }
         } catch (e: Exception) {
-            // Falls das Schreiben fehlschlägt, zumindest in Logcat ausgeben
+            println(e.message)
+            println(e.stackTraceToString())
         }
     }
 }

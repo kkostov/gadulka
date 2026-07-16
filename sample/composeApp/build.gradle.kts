@@ -69,6 +69,7 @@ kotlin {
             implementation(libs.koin.androidx.compose)
             implementation(libs.koin.androidx.workmanager)
         }
+
         commonMain.dependencies {
             implementation(compose.components.resources)
 
@@ -84,6 +85,7 @@ kotlin {
             implementation(libs.kermit)
             implementation(libs.bundles.koin)
         }
+
         desktopMain.dependencies {
             implementation(compose.desktop.currentOs)
             implementation(libs.kotlinx.coroutines.swing)
@@ -108,6 +110,12 @@ kotlin {
             implementation("org.openjfx:javafx-media:$javafxVersion:$classifier")
             //noinspection UseTomlInstead,NewerVersionAvailable
             implementation("org.openjfx:javafx-swing:$javafxVersion:$classifier")
+        }
+
+        iosMain.dependencies {
+        }
+
+        nativeMain.dependencies {
         }
     }
 }

@@ -1,4 +1,4 @@
-package eu.iamkonstantin.gadulkaplayer
+package eu.iamkonstantin.gadulkaplayer.di
 
 import co.touchlab.kermit.DefaultFormatter
 import co.touchlab.kermit.LogWriter
