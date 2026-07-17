@@ -9,6 +9,12 @@ plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
+    id("org.openjfx.javafxplugin") version "0.1.0"
+}
+
+javafx {
+    version = "21"
+    modules("javafx.controls", "javafx.media", "javafx.swing")
 }
 
 kotlin {
@@ -31,6 +37,7 @@ kotlin {
     }
 
     jvm("desktop")
+    jvmToolchain(21)
 
     @OptIn(ExperimentalWasmDsl::class)
     wasmJs {
@@ -58,8 +65,14 @@ kotlin {
         androidMain.dependencies {
             implementation(compose.preview)
             implementation(libs.androidx.activity.compose)
+            implementation(libs.koin.android)
+            implementation(libs.koin.androidx.compose)
+            implementation(libs.koin.androidx.workmanager)
         }
+
         commonMain.dependencies {
+            implementation(compose.components.resources)
+
             implementation(compose.runtime)
             implementation(compose.foundation)
             implementation(compose.material3)
@@ -69,10 +82,40 @@ kotlin {
             implementation(libs.androidx.lifecycle.viewmodel)
             implementation(libs.androidx.lifecycle.runtime.compose)
             implementation(project(":gadulka"))
+            implementation(libs.kermit)
+            implementation(libs.bundles.koin)
         }
+
         desktopMain.dependencies {
             implementation(compose.desktop.currentOs)
             implementation(libs.kotlinx.coroutines.swing)
+
+            implementation(compose.desktop.currentOs)
+
+            val javafxVersion = "21"
+            val osName = System.getProperty("os.name").lowercase()
+            val classifier = when {
+                osName.contains("win") -> "win"
+                osName.contains("mac") -> "mac"
+                else -> "linux"
+            }
+
+            //noinspection UseTomlInstead,NewerVersionAvailable
+            implementation("org.openjfx:javafx-base:$javafxVersion:$classifier")
+            //noinspection UseTomlInstead,NewerVersionAvailable
+            implementation("org.openjfx:javafx-graphics:$javafxVersion:$classifier")
+            //noinspection UseTomlInstead,NewerVersionAvailable
+            implementation("org.openjfx:javafx-controls:$javafxVersion:$classifier")
+            //noinspection UseTomlInstead,NewerVersionAvailable
+            implementation("org.openjfx:javafx-media:$javafxVersion:$classifier")
+            //noinspection UseTomlInstead,NewerVersionAvailable
+            implementation("org.openjfx:javafx-swing:$javafxVersion:$classifier")
+        }
+
+        iosMain.dependencies {
+        }
+
+        nativeMain.dependencies {
         }
     }
 }
@@ -118,4 +161,9 @@ compose.desktop {
             packageVersion = "1.0.0"
         }
     }
+}
+
+compose.resources {
+    publicResClass = true
+    packageOfResClass = "eu.iamkonstantin.gadulkaplayer.compose.resources"
 }
