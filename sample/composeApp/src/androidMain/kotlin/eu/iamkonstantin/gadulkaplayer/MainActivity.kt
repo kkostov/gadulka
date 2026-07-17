@@ -9,7 +9,6 @@ import co.touchlab.kermit.Logger
 import co.touchlab.kermit.Severity
 import eu.iamkonstantin.gadulkaplayer.di.platformModule
 import eu.iamkonstantin.gadulkaplayer.di.sharedModule
-import eu.iamkonstantin.kotlin.gadulka.GadulkaPlayer
 import org.koin.android.ext.android.getKoin
 import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.workmanager.koin.workManagerFactory

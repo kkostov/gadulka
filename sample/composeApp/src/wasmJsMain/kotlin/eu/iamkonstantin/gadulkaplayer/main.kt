@@ -8,7 +8,6 @@ import eu.iamkonstantin.gadulkaplayer.di.platformModule
 import eu.iamkonstantin.gadulkaplayer.di.sharedModule
 import kotlinx.browser.document
 import org.koin.core.context.startKoin
-import org.koin.core.qualifier.named
 
 @OptIn(ExperimentalComposeUiApi::class)
 fun main() {

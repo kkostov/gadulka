@@ -9,12 +9,10 @@ import org.w3c.files.Blob
 
 class WasmAudioStorage() : AudioStorage {
 
-    override suspend fun prepareAudio(fileName: String): String? = runCatching {
+    override suspend fun prepareAudio(fileName: String?): String? = runCatching {
         val bytes: ByteArray = Res.readBytes("files/$fileName")
         val buffer = Uint8Array(bytes.size)
-        for (i in bytes.indices) {
-            buffer[i] = bytes[i]
-        }
+        bytes.forEachIndexed { i, b -> buffer[i] = b }
         val blob = createBlobFromBuffer(buffer, "audio/mpeg")
 
         URL.createObjectURL(blob)
