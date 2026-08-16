@@ -9,6 +9,7 @@ plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
+    alias(libs.plugins.osdetector)
 }
 
 kotlin {
@@ -73,6 +74,19 @@ kotlin {
         desktopMain.dependencies {
             implementation(compose.desktop.currentOs)
             implementation(libs.kotlinx.coroutines.swing)
+            val fxSuffix = when (osdetector.classifier) {
+                "linux-x86_64" -> "linux"
+                "linux-aarch_64" -> "linux-aarch64"
+                "windows-x86_64" -> "win"
+                "windows-aarch_64" -> "win-aarch64"
+                "osx-x86_64" -> "mac"
+                "osx-aarch_64" -> "mac-aarch64"
+                else -> throw IllegalStateException("Unknown OS: ${osdetector.classifier}")
+            }
+            implementation("org.openjfx:javafx-base:23:${fxSuffix}")
+            implementation("org.openjfx:javafx-graphics:23:${fxSuffix}")
+            implementation("org.openjfx:javafx-swing:23:${fxSuffix}")
+            implementation("org.openjfx:javafx-media:23:${fxSuffix}")
         }
     }
 }
