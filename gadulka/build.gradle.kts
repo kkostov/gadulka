@@ -3,13 +3,12 @@
  *  Use of this source code is governed by the BSD 3-Clause License that can be found in LICENSE file.
  */
 
-import org.jetbrains.dokka.gradle.DokkaTask
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
-    alias(libs.plugins.androidLibrary)
+    alias(libs.plugins.androidKmpLibrary)
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
     alias(libs.plugins.vanniktech.mavenPublish)
@@ -27,8 +26,10 @@ kotlin {
             jvmTarget.set(JvmTarget.JVM_11)
         }
     }
-    androidTarget {
-        publishLibraryVariants("release")
+    android {
+        namespace = "eu.iamkonstantin.kotlin.gadulka"
+        compileSdk = libs.versions.android.compileSdk.get().toInt()
+        minSdk = libs.versions.android.minSdk.get().toInt()
     }
     iosArm64()
     iosSimulatorArm64()
@@ -91,14 +92,6 @@ kotlin {
     }
 }
 
-android {
-    namespace = "eu.iamkonstantin.kotlin.gadulka"
-    compileSdk = libs.versions.android.compileSdk.get().toInt()
-    defaultConfig {
-        minSdk = libs.versions.android.minSdk.get().toInt()
-    }
-}
-
 mavenPublishing {
     publishToMavenCentral()
 
@@ -129,11 +122,53 @@ mavenPublishing {
     }
 }
 
-tasks.withType<DokkaTask>().configureEach {
+val generateDokkaModuleDocs by tasks.registering(GenerateDokkaModuleDocs::class) {
+    readme.set(layout.projectDirectory.file("../README.md"))
+    moduleDocs.set(layout.buildDirectory.file("dokka/Module.md"))
+}
+
+dokka {
     moduleName.set("Gadulka")
-    offlineMode.set(true)
+    dokkaPublications.configureEach {
+        offlineMode.set(true)
+    }
+    dokkaSourceSets.configureEach {
+        includes.from(generateDokkaModuleDocs.flatMap { it.moduleDocs })
+    }
 }
 
 tasks.register("dokkaHtml") {
     dependsOn("dokkaGeneratePublicationHtml")
+}
+
+/**
+ * Turns the repository README into the Dokka module docs shown on the landing page:
+ * drops the badges and title (Dokka supplies its own), rewrites relative repo links
+ * to absolute GitHub URLs, and points the image at the copy served alongside the docs.
+ */
+abstract class GenerateDokkaModuleDocs : DefaultTask() {
+    @get:InputFile
+    @get:PathSensitive(PathSensitivity.RELATIVE)
+    abstract val readme: RegularFileProperty
+
+    @get:OutputFile
+    abstract val moduleDocs: RegularFileProperty
+
+    @TaskAction
+    fun generate() {
+        val readmeText = readme.get().asFile.readText()
+        val heading = "# Gadulka"
+        val headingIndex = readmeText.indexOf(heading)
+        val body = if (headingIndex >= 0) readmeText.substring(headingIndex + heading.length) else readmeText
+
+        val rewritten = body
+            .replace("](CONTRIBUTING.md)", "](https://github.com/kkostov/gadulka/blob/main/CONTRIBUTING.md)")
+            .replace("](LICENSE)", "](https://github.com/kkostov/gadulka/blob/main/LICENSE)")
+            .replace("./images/kodee.jpg", "images/kodee.jpg")
+            .trimStart('\n')
+
+        val outputFile = moduleDocs.get().asFile
+        outputFile.parentFile.mkdirs()
+        outputFile.writeText("# Module Gadulka\n\n$rewritten")
+    }
 }

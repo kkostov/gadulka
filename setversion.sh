@@ -21,7 +21,7 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
   sed -i '' "s/^version = .*$/version = \"${NEW_VERSION}\"/g" "${FILE_PATH}"
 else
   # Linux
-  sed -i "/version = /c\version = \"${NEW_VERSION}\"" "${FILE_PATH}"
+  sed -i "/^version = /c\version = \"${NEW_VERSION}\"" "${FILE_PATH}"
 fi
 
 echo "Version updated to ${NEW_VERSION}."
