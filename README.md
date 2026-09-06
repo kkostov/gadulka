@@ -30,7 +30,7 @@ does not provide any UI (this will be up to you). You can read more about my mot
 Gadulka is available from Maven Central at the following coordinates:
 
 ```
-implementation("eu.iamkonstantin.kotlin:gadulka:1.12.0")
+implementation("eu.iamkonstantin.kotlin:gadulka:1.13.0")
 ```
 
 ### Example
@@ -109,6 +109,7 @@ fun AudioPlayer() {
 ```
 
 Additional methods to control volume, position and playback rate are [also available](https://gadulka.iamkonstantin.eu).
+
 
 
 Gadulka links against but doesn't bundle JavaFX. You may need to adapt your gradle file to add the corresponding dependencies e.g.:

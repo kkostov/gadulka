@@ -7,6 +7,8 @@
 
 package eu.iamkonstantin.kotlin.gadulka
 
+import eu.iamkonstantin.kotlin.gadulka.cinterop.GadulkaKeyValueObservingProtocol
+import kotlinx.cinterop.COpaquePointer
 import kotlinx.cinterop.CValue
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.useContents
@@ -14,9 +16,15 @@ import platform.AVFAudio.AVAudioSession
 import platform.AVFAudio.AVAudioSessionCategoryPlayback
 import platform.AVFoundation.*
 import platform.CoreMedia.*
+import platform.Foundation.NSKeyValueObservingOptionNew
 import platform.Foundation.NSNotificationCenter
 import platform.Foundation.NSURL
+import platform.Foundation.addObserver
+import platform.Foundation.removeObserver
 import platform.darwin.NSEC_PER_SEC
+import platform.darwin.NSObject
+import platform.darwin.dispatch_async
+import platform.darwin.dispatch_get_main_queue
 
 @Suppress("EXPECT_ACTUAL_CLASSIFIERS_ARE_IN_BETA_WARNING")
 actual class GadulkaPlayer actual constructor() {
@@ -165,6 +173,7 @@ actual class GadulkaPlayer actual constructor() {
                 _state = GadulkaPlayerState.BUFFERING
             },
             onAVPlayerError = {
+                _state = GadulkaPlayerState.IDLE
                 errorListener?.onError(it)
             }
         )
@@ -177,12 +186,15 @@ actual class GadulkaPlayer actual constructor() {
     }
 }
 
-class CupertinoAVPlayerObserver(private val player: AVPlayer?) {
+private class CupertinoAVPlayerObserver(private val player: AVPlayer?) : NSObject(), GadulkaKeyValueObservingProtocol {
     // based on https://developer.apple.com/documentation/avfoundation/monitoring-playback-progress-in-your-app
     private var timeObserver: Any? = null
     private var endObserver: Any? = null
     private var stallObserver: Any? = null
     private var errorObserver: Any? = null
+    private var statusObservedItem: AVPlayerItem? = null
+    private var onAVPlayerUpdated: (() -> Unit)? = null
+    private var onAVPlayerError: ((message: String) -> Unit)? = null
 
     @OptIn(ExperimentalForeignApi::class)
     fun attach(
@@ -193,6 +205,9 @@ class CupertinoAVPlayerObserver(private val player: AVPlayer?) {
     ) {
         detach()
         if (player == null) return
+
+        this.onAVPlayerUpdated = onAVPlayerUpdated
+        this.onAVPlayerError = onAVPlayerError
 
         // Buffering state
         onAVPlayerUpdated()
@@ -228,7 +243,22 @@ class CupertinoAVPlayerObserver(private val player: AVPlayer?) {
                 onAVPlayerError(error?:"Not available")
             }
 
+            item.addObserver(this, forKeyPath = "status", options = NSKeyValueObservingOptionNew, context = null)
+            statusObservedItem = item
+        }
+    }
 
+    @OptIn(ExperimentalForeignApi::class)
+    override fun observeValueForKeyPath(keyPath: String?, ofObject: Any?, change: Map<Any?, *>?, context: COpaquePointer?) {
+        if (keyPath != "status") return
+        val item = ofObject as? AVPlayerItem ?: return
+        when (item.status) {
+            AVPlayerItemStatusFailed -> dispatch_async(dispatch_get_main_queue()) {
+                onAVPlayerError?.invoke(item.error?.localizedDescription ?: "Playback failed")
+            }
+            AVPlayerItemStatusReadyToPlay -> dispatch_async(dispatch_get_main_queue()) {
+                onAVPlayerUpdated?.invoke()
+            }
         }
     }
 
@@ -241,5 +271,9 @@ class CupertinoAVPlayerObserver(private val player: AVPlayer?) {
         stallObserver = null
         errorObserver?.let { NSNotificationCenter.defaultCenter.removeObserver(it) }
         errorObserver = null
+        statusObservedItem?.removeObserver(this, forKeyPath = "status")
+        statusObservedItem = null
+        onAVPlayerUpdated = null
+        onAVPlayerError = null
     }
 }

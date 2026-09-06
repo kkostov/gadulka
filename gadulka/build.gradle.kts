@@ -3,6 +3,8 @@
  *  Use of this source code is governed by the BSD 3-Clause License that can be found in LICENSE file.
  */
 
+import org.gradle.api.publish.maven.tasks.PublishToMavenRepository
+import org.gradle.plugins.signing.SigningExtension
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
@@ -31,8 +33,16 @@ kotlin {
         compileSdk = libs.versions.android.compileSdk.get().toInt()
         minSdk = libs.versions.android.minSdk.get().toInt()
     }
-    iosArm64()
-    iosSimulatorArm64()
+    listOf(
+        iosArm64(),
+        iosSimulatorArm64()
+    ).forEach { iosTarget ->
+        iosTarget.compilations.getByName("main") {
+            cinterops {
+                create("GadulkaKeyValueObserving")
+            }
+        }
+    }
 
     @OptIn(org.jetbrains.kotlin.gradle.ExperimentalWasmDsl::class)
     wasmJs {
@@ -42,52 +52,40 @@ kotlin {
 
 
     sourceSets {
-        val commonMain by getting {
-            dependencies {
-                implementation(compose.runtime)
-                implementation(compose.foundation)
-            }
+        commonMain.dependencies {
+            implementation(compose.runtime)
+            implementation(compose.foundation)
         }
-        val commonTest by getting {
-            dependencies {
-                implementation(libs.kotlin.test)
-            }
+        commonTest.dependencies {
+            implementation(libs.kotlin.test)
         }
-        val jvmMain by getting {
-            dependencies {
-                val fxSuffix = when (osdetector.classifier) {
-                    "linux-x86_64" -> "linux"
-                    "linux-aarch_64" -> "linux-aarch64"
-                    "windows-x86_64" -> "win"
-                    "windows-aarch_64" -> "win-aarch64"
-                    "osx-x86_64" -> "mac"
-                    "osx-aarch_64" -> "mac-aarch64"
-                    else -> throw IllegalStateException("Unknown OS: ${osdetector.classifier}")
-                }
-                compileOnly("org.openjfx:javafx-base:23:${fxSuffix}")
-                compileOnly("org.openjfx:javafx-graphics:23:${fxSuffix}")
-                compileOnly("org.openjfx:javafx-swing:23:${fxSuffix}")
-                compileOnly("org.openjfx:javafx-media:23:${fxSuffix}")
+        jvmMain.dependencies {
+            val fxSuffix = when (osdetector.classifier) {
+                "linux-x86_64" -> "linux"
+                "linux-aarch_64" -> "linux-aarch64"
+                "windows-x86_64" -> "win"
+                "windows-aarch_64" -> "win-aarch64"
+                "osx-x86_64" -> "mac"
+                "osx-aarch_64" -> "mac-aarch64"
+                else -> throw IllegalStateException("Unknown OS: ${osdetector.classifier}")
             }
+            compileOnly("org.openjfx:javafx-base:23:${fxSuffix}")
+            compileOnly("org.openjfx:javafx-graphics:23:${fxSuffix}")
+            compileOnly("org.openjfx:javafx-swing:23:${fxSuffix}")
+            compileOnly("org.openjfx:javafx-media:23:${fxSuffix}")
         }
 
-        val jvmTest by getting {
-            dependencies {
-                implementation(libs.kotlin.test)
-            }
+        jvmTest.dependencies {
+            implementation(libs.kotlin.test)
         }
 
-        val wasmJsMain by getting {
-            dependencies {
-                implementation(libs.kotlinx.browser)
-            }
+        wasmJsMain.dependencies {
+            implementation(libs.kotlinx.browser)
         }
 
-        val androidMain by getting {
-            dependencies {
-                implementation(libs.androix.media3.exploplayer)
-                implementation(libs.androidcontextprovider)
-            }
+        androidMain.dependencies {
+            implementation(libs.androix.media3.exploplayer)
+            implementation(libs.androidcontextprovider)
         }
     }
 }
@@ -122,7 +120,11 @@ mavenPublishing {
     }
 }
 
-val generateDokkaModuleDocs by tasks.registering(GenerateDokkaModuleDocs::class) {
+configure<SigningExtension> {
+    setRequired(provider { gradle.taskGraph.allTasks.any { it is PublishToMavenRepository } })
+}
+
+val generateDokkaModuleDocs = tasks.register<GenerateDokkaModuleDocs>("generateDokkaModuleDocs") {
     readme.set(layout.projectDirectory.file("../README.md"))
     moduleDocs.set(layout.buildDirectory.file("dokka/Module.md"))
 }

@@ -22,6 +22,10 @@ kotlin {
         compilerOptions {
             jvmTarget.set(JvmTarget.JVM_11)
         }
+
+        androidResources {
+            enable = true
+        }
     }
 
     listOf(
@@ -61,8 +65,6 @@ kotlin {
     }
 
     sourceSets {
-        val desktopMain by getting
-
         commonMain.dependencies {
             implementation(compose.runtime)
             implementation(compose.foundation)
@@ -74,7 +76,7 @@ kotlin {
             implementation(libs.androidx.lifecycle.runtime.compose)
             implementation(project(":gadulka"))
         }
-        desktopMain.dependencies {
+        getByName("desktopMain").dependencies {
             implementation(compose.desktop.currentOs)
             implementation(libs.kotlinx.coroutines.swing)
             val fxSuffix = when (osdetector.classifier) {
