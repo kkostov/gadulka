@@ -21,6 +21,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@85e6279cec87321a52edac9c87bce653a07cf6c2
+        with:
+          fetch-depth: 0
       - name: Validate Gradle Wrapper
         uses: gradle/actions/wrapper-validation@4a417b5b1a01db0b076987546b67f8de18e7d340
       - uses: actions/cache@v3
@@ -33,6 +35,9 @@ jobs:
         with:
           java-version: "21"
           distribution: "temurin"
+      - name: Set version
+        run: |
+          bash ./setversion.sh "$(git describe --tags --abbrev=0)" gadulka/build.gradle.kts
       - name: Dokka Build
         run: |
           ./gradlew dokkaGeneratePublicationHtml
@@ -49,11 +54,12 @@ jobs:
         run: |
           mkdir -p all/pages
           cp -r gadulka/build/dokka/html/* all/pages
+          cp -r images/. all/pages/images/
           mkdir -p all/pages/wasm
           cp -r sample/composeApp/build/dist/wasmJs/productionExecutable/* all/pages/wasm
           mkdir -p all/pages/sbom
-          cp gadulka/build/reports/bom.xml all/pages/sbom/bom.xml
-          cp gadulka/build/reports/bom.json all/pages/sbom/bom.json
+          cp gadulka/build/reports/cyclonedx/bom.xml all/pages/sbom/bom.xml
+          cp gadulka/build/reports/cyclonedx/bom.json all/pages/sbom/bom.json
       - name: Upload artifact pour GitHub Pages
         uses: actions/upload-pages-artifact@2d163be3ddce01512f3eea7ac5b7023b5d643ce1
         with:

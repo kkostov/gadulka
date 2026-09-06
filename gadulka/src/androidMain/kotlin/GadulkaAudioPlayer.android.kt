@@ -42,8 +42,10 @@ actual class GadulkaPlayer actual constructor() {
     @OptIn(UnstableApi::class)
     actual fun play() {
         if(mediaPlayer.isCommandAvailable(Player.COMMAND_PLAY_PAUSE)) {
-            if (currentPlayerState() == GadulkaPlayerState.IDLE)
+            if (currentPlayerState() == GadulkaPlayerState.IDLE) {
+                if (mediaPlayer.isCommandAvailable(Player.COMMAND_PREPARE)) mediaPlayer.prepare()
                 seekTo(0)
+            }
             mediaPlayer.play()
         }
     }
@@ -99,6 +101,7 @@ actual class GadulkaPlayer actual constructor() {
 
     actual fun stop() {
         mediaPlayer.stop()
+        mediaPlayer.seekTo(0)
     }
 
     actual fun pause() {

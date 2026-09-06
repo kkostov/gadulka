@@ -3,14 +3,14 @@
  *  Use of this source code is governed by the BSD 3-Clause License that can be found in LICENSE file.
  */
 
-import com.vanniktech.maven.publish.SonatypeHost
-import org.jetbrains.dokka.gradle.DokkaTask
+import org.gradle.api.publish.maven.tasks.PublishToMavenRepository
+import org.gradle.plugins.signing.SigningExtension
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
-    alias(libs.plugins.androidLibrary)
+    alias(libs.plugins.androidKmpLibrary)
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
     alias(libs.plugins.vanniktech.mavenPublish)
@@ -28,12 +28,21 @@ kotlin {
             jvmTarget.set(JvmTarget.JVM_11)
         }
     }
-    androidTarget {
-        publishLibraryVariants("release")
+    android {
+        namespace = "eu.iamkonstantin.kotlin.gadulka"
+        compileSdk = libs.versions.android.compileSdk.get().toInt()
+        minSdk = libs.versions.android.minSdk.get().toInt()
     }
-    iosX64()
-    iosArm64()
-    iosSimulatorArm64()
+    listOf(
+        iosArm64(),
+        iosSimulatorArm64()
+    ).forEach { iosTarget ->
+        iosTarget.compilations.getByName("main") {
+            cinterops {
+                create("GadulkaKeyValueObserving")
+            }
+        }
+    }
 
     @OptIn(org.jetbrains.kotlin.gradle.ExperimentalWasmDsl::class)
     wasmJs {
@@ -43,66 +52,46 @@ kotlin {
 
 
     sourceSets {
-        val commonMain by getting {
-            dependencies {
-                implementation(compose.runtime)
-                implementation(compose.foundation)
-            }
+        commonMain.dependencies {
+            implementation(compose.runtime)
+            implementation(compose.foundation)
         }
-        val commonTest by getting {
-            dependencies {
-                implementation(libs.kotlin.test)
-            }
+        commonTest.dependencies {
+            implementation(libs.kotlin.test)
         }
-        val jvmMain by getting {
-            dependencies {
-                val fxSuffix = when (osdetector.classifier) {
-                    "linux-x86_64" -> "linux"
-                    "linux-aarch_64" -> "linux-aarch64"
-                    "windows-x86_64" -> "win"
-                    "windows-aarch_64" -> "win-aarch64"
-                    "osx-x86_64" -> "mac"
-                    "osx-aarch_64" -> "mac-aarch64"
-                    else -> throw IllegalStateException("Unknown OS: ${osdetector.classifier}")
-                }
-                compileOnly("org.openjfx:javafx-base:23:${fxSuffix}")
-                compileOnly("org.openjfx:javafx-graphics:23:${fxSuffix}")
-                compileOnly("org.openjfx:javafx-swing:23:${fxSuffix}")
-                compileOnly("org.openjfx:javafx-media:23:${fxSuffix}")
+        jvmMain.dependencies {
+            val fxSuffix = when (osdetector.classifier) {
+                "linux-x86_64" -> "linux"
+                "linux-aarch_64" -> "linux-aarch64"
+                "windows-x86_64" -> "win"
+                "windows-aarch_64" -> "win-aarch64"
+                "osx-x86_64" -> "mac"
+                "osx-aarch_64" -> "mac-aarch64"
+                else -> throw IllegalStateException("Unknown OS: ${osdetector.classifier}")
             }
+            compileOnly("org.openjfx:javafx-base:23:${fxSuffix}")
+            compileOnly("org.openjfx:javafx-graphics:23:${fxSuffix}")
+            compileOnly("org.openjfx:javafx-swing:23:${fxSuffix}")
+            compileOnly("org.openjfx:javafx-media:23:${fxSuffix}")
         }
 
-        val jvmTest by getting {
-            dependencies {
-                implementation(libs.kotlin.test)
-            }
+        jvmTest.dependencies {
+            implementation(libs.kotlin.test)
         }
 
-        val wasmJsMain by getting {
-            dependencies {
-                implementation(libs.kotlinx.browser)
-            }
+        wasmJsMain.dependencies {
+            implementation(libs.kotlinx.browser)
         }
 
-        val androidMain by getting {
-            dependencies {
-                implementation(libs.androix.media3.exploplayer)
-                implementation(libs.androidcontextprovider)
-            }
+        androidMain.dependencies {
+            implementation(libs.androix.media3.exploplayer)
+            implementation(libs.androidcontextprovider)
         }
-    }
-}
-
-android {
-    namespace = "eu.iamkonstantin.kotlin.gadulka"
-    compileSdk = libs.versions.android.compileSdk.get().toInt()
-    defaultConfig {
-        minSdk = libs.versions.android.minSdk.get().toInt()
     }
 }
 
 mavenPublishing {
-    publishToMavenCentral(SonatypeHost.CENTRAL_PORTAL)
+    publishToMavenCentral()
 
     signAllPublications()
 
@@ -131,11 +120,57 @@ mavenPublishing {
     }
 }
 
-tasks.withType<DokkaTask>().configureEach {
+configure<SigningExtension> {
+    setRequired(provider { gradle.taskGraph.allTasks.any { it is PublishToMavenRepository } })
+}
+
+val generateDokkaModuleDocs = tasks.register<GenerateDokkaModuleDocs>("generateDokkaModuleDocs") {
+    readme.set(layout.projectDirectory.file("../README.md"))
+    moduleDocs.set(layout.buildDirectory.file("dokka/Module.md"))
+}
+
+dokka {
     moduleName.set("Gadulka")
-    offlineMode.set(true)
+    dokkaPublications.configureEach {
+        offlineMode.set(true)
+    }
+    dokkaSourceSets.configureEach {
+        includes.from(generateDokkaModuleDocs.flatMap { it.moduleDocs })
+    }
 }
 
 tasks.register("dokkaHtml") {
     dependsOn("dokkaGeneratePublicationHtml")
+}
+
+/**
+ * Turns the repository README into the Dokka module docs shown on the landing page:
+ * drops the badges and title (Dokka supplies its own), rewrites relative repo links
+ * to absolute GitHub URLs, and points the image at the copy served alongside the docs.
+ */
+abstract class GenerateDokkaModuleDocs : DefaultTask() {
+    @get:InputFile
+    @get:PathSensitive(PathSensitivity.RELATIVE)
+    abstract val readme: RegularFileProperty
+
+    @get:OutputFile
+    abstract val moduleDocs: RegularFileProperty
+
+    @TaskAction
+    fun generate() {
+        val readmeText = readme.get().asFile.readText()
+        val heading = "# Gadulka"
+        val headingIndex = readmeText.indexOf(heading)
+        val body = if (headingIndex >= 0) readmeText.substring(headingIndex + heading.length) else readmeText
+
+        val rewritten = body
+            .replace("](CONTRIBUTING.md)", "](https://github.com/kkostov/gadulka/blob/main/CONTRIBUTING.md)")
+            .replace("](LICENSE)", "](https://github.com/kkostov/gadulka/blob/main/LICENSE)")
+            .replace("./images/kodee.jpg", "images/kodee.jpg")
+            .trimStart('\n')
+
+        val outputFile = moduleDocs.get().asFile
+        outputFile.parentFile.mkdirs()
+        outputFile.writeText("# Module Gadulka\n\n$rewritten")
+    }
 }

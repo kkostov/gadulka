@@ -16,3 +16,4 @@ dependencyResolutionManagement {
 rootProject.name = "gadulka"
 include(":gadulka")
 include(":sample:composeApp")
+include(":sample:androidApp")

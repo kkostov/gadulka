@@ -9,6 +9,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.unit.dp
+import eu.iamkonstantin.kotlin.gadulka.ErrorListener
 import eu.iamkonstantin.kotlin.gadulka.GadulkaPlayerState
 import eu.iamkonstantin.kotlin.gadulka.rememberGadulkaLiveState
 import org.jetbrains.compose.ui.tooling.preview.Preview
@@ -18,7 +19,7 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 @Preview
 fun App() {
     MaterialTheme {
-        Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
+        Column(Modifier.fillMaxWidth().statusBarsPadding(), horizontalAlignment = Alignment.CenterHorizontally) {
             AudioPlayer()
         }
     }
@@ -28,6 +29,15 @@ fun App() {
 fun AudioPlayer() {
     val gadulka = rememberGadulkaLiveState()
     val url = remember { mutableStateOf("https://download.samplelib.com/wav/sample-12s.wav") }
+    val errorMessage = remember { mutableStateOf<String?>(null) }
+
+    LaunchedEffect(gadulka.player) {
+        gadulka.player.setOnErrorListener(object : ErrorListener {
+            override fun onError(message: String?) {
+                errorMessage.value = message
+            }
+        })
+    }
 
     Column(
         modifier = Modifier.padding(16.dp),
@@ -46,6 +56,8 @@ fun AudioPlayer() {
                 Text("Volume: ${gadulka.volume}")
 
                 Text("Position: ${gadulka.position / 1000}s / ${gadulka.duration / 1000}s")
+
+                errorMessage.value?.let { Text(it) }
             }
         }
 

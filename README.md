@@ -30,7 +30,7 @@ does not provide any UI (this will be up to you). You can read more about my mot
 Gadulka is available from Maven Central at the following coordinates:
 
 ```
-implementation("eu.iamkonstantin.kotlin:gadulka:1.12.0")
+implementation("eu.iamkonstantin.kotlin:gadulka:1.13.0")
 ```
 
 ### Example
@@ -111,6 +111,7 @@ fun AudioPlayer() {
 Additional methods to control volume, position and playback rate are [also available](https://gadulka.iamkonstantin.eu).
 
 
+
 Gadulka links against but doesn't bundle JavaFX. You may need to adapt your gradle file to add the corresponding dependencies e.g.:
 
 ```kotlin
@@ -149,6 +150,11 @@ While my personal projects use a self-hosted Forgejo or take advantage of the fa
 pipeline for Gadulka requires a macOS build in order to test iOS compatibility. This is a very intensive (and expensive)
 run for which GitHub makes more sense. Of course, this is something that can change in the future.
 
+
+## Contributions
+
+Before contributing any code, please also read the full [Contributing Guide](CONTRIBUTING.md).
+ 
 ## License 📃
 
 The library is licensed with the BSD-3-Clause license, more information in [LICENSE](LICENSE).

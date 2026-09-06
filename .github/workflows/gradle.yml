@@ -30,9 +30,7 @@ jobs:
             os: ubuntu-latest
           - target: jvmTest
             os: windows-latest
-          - target: testDebugUnitTest
-            os: ubuntu-latest
-          - target: testReleaseUnitTest
+          - target: ":sample:androidApp:assembleDebug"
             os: ubuntu-latest
     runs-on: ${{ matrix.os }}
 
